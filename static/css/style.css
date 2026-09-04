@@ -5,12 +5,10 @@
 }
 
 :root {
-    --ink: #1c1917;
-    --paper: #faf6f0;
-    --accent: #d95d39;
-    --accent-dark: #a8442a;
-    --line: #e3d9c9;
-    --text-muted: #6b6459;
+    --ink: #f4f7fb;
+    --paper: #050b18;
+    --line: #1e2b43;
+    --text-muted: #a9b5c8;
     --radius: 4px;
 }
 
@@ -101,6 +99,21 @@ h1, .brand {
     margin-bottom: 1.5rem;
 }
 
+.bio-highlight {
+    color: var(--accent-dark);
+    font-weight: 700;
+    text-shadow: 0 0 14px rgba(255, 154, 130, 0.2);
+}
+
+.bio-number {
+    display: inline-block;
+    color: var(--ink);
+    background-color: var(--accent);
+    padding: 0 0.25rem;
+    border-radius: 2px;
+    line-height: 1.25;
+}
+
 .meta-list {
     display: flex;
     gap: 2rem;
@@ -176,6 +189,54 @@ h1, .brand {
     border-top: 1px solid var(--line);
 }
 
+.experience-section {
+    padding: 2rem 0 5rem;
+}
+
+.experience-section h2 {
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+}
+
+.experience-list {
+    display: grid;
+    gap: 2.5rem;
+}
+
+.experience-item {
+    border-top: 1px solid var(--line);
+    padding-top: 1.25rem;
+}
+
+.experience-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.experience-item h3 {
+    font-size: 1.15rem;
+}
+
+.experience-heading p,
+.experience-item h4 {
+    color: var(--text-muted);
+}
+
+.experience-item h4 {
+    margin: 0.25rem 0 0.75rem;
+    font-size: 0.95rem;
+}
+
+.experience-item ul {
+    padding-left: 1.25rem;
+    color: var(--text-muted);
+}
+
+.experience-item li + li {
+    margin-top: 0.5rem;
+}
+
 @media (max-width: 600px) {
     .hero-grid {
         grid-template-columns: 1fr;
@@ -191,5 +252,9 @@ h1, .brand {
 
     .social-links {
         justify-content: flex-start;
+    }
+
+    .experience-heading {
+        display: block;
     }
 }
