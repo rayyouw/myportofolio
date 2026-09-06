@@ -9,16 +9,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
+
 <body>
+    <!--Menambahkan bagian header yang berisi navigasi ke bagian profile, education, projects, awards, skills, dan contact-->
     <header class="site-header">
         <div class="container">
             <a href="#profile" class="brand">Rayhan</a>
             <nav>
                 <a href="#profile">Profile</a>
+                <a href="#education">Education</a>
+                <a href="#experience">Experience</a>
+                <a href="#projects">Projects</a>
+                <a href="#awards">Awards</a>
+                <a href="#skills">Skills</a>
+                <a href="#contact">Contact</a>
             </nav>
         </div>
     </header>
 
+    <!--Menambahkan bagian profile yang berisi pengenalan singkat mengenai saya-->
     <main>
         <section class="hero" id="profile">
             <div class="container hero-grid">
@@ -52,12 +61,29 @@
         </section>
     </main>
     
-    <main>
-        <section class="hero" id="Education">
-            
+    <!--Menambahkan bagian education yang berisi riwayat pendidikan saya
+    <main>--> 
+        <section class="education-section" id="education">
+            <div class = "container">
+                <h2>EDUCATION</h2>
+                <div class = "education-list">
+                    <article class="education-item">
+                        <div class="experience-heading">
+                            <h3>Universitas Indonesia</h3>
+                            <p>2025 - Now</p>
+                        </div>
+                        <h4>Bachelor of Computer Science &middot; GPA 3.69 / 4.00</h4>
+                        <ul>
+                            <li>Relevant coursework: Discrete Mathematics, Data Structures &amp; Algorithms, Linear Algebra, Statistics, and Programming Foundations.</li>
+                            <li>Teaching Assistant for Discrete Mathematics 1 at Fakultas Ilmu Komputer.</li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
         </section>
     </main>
 
+    <!--Menambahkan bagian experience yang berisi pengalaman saya, mulai dari pengalaman kerja, organisasi, dan sukarelawan.-->
     <main>
         <section class="experience-section" id="Experience">
             <div class="container">
@@ -139,12 +165,63 @@
         </section>
     </main>
 
+    <!--Menambahkan bagian awards yang berisi penghargaan-penghargaan yang saya miliki.-->
+    <section class="awards-section" id="awards">
+            <div class="container">
+                <h2>AWARDS</h2>
+                <div class="awards-list">
+                    <article class="awards-item">
+                        <h3>Data Mining - GEMASTIK 2026</h3>
+                        <p>Representative of Universitas Indonesia</p>
+                    </article>
+                    <article class="awards-item">
+                        <h3>Big Data Challenge - SATRIA DATA 2026</h3>
+                        <p>Representative of Universitas Indonesia</p>
+                    </article>
+                    <article class="awards-item">
+                        <h3>National Olympiad in Informatics (OSN Informatika) 2024</h3>
+                        <p>Silver medal at provincial level</p>
+                    </article>
+                    <article class="awards-item">
+                        <h3>National Olympiad in Informatics (OSN Informatika) 2023</h3>
+                        <p>Silver medal at provincial level</p>
+                    </article>
+                    <article class="awards-item">
+                        <h3> National Olympiad in Mathematics (OSN Matematika) 2018</h3>
+                        <p>Finalist at national level</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+    <!--Menambahkan bagian skills yang berisi kemampuan-kemampuan yang saya miliki.-->
     <main>
-        <section class="hero" id="Skills">
-            
+        <section class="skills-section" id="skills">
+            <div class="container">
+                <h2>SKILLS</h2>
+                <div class="skills-list">
+                    <div class="skill-category">
+                        <h3>Programming</h3>
+                        <p>Python, C++, Java, HTML, CSS</p>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Data &amp; Machine Learning</h3>
+                        <p>pandas, NumPy, scikit-learn, OpenCV, PyTorch</p>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Tools &amp; Productivity</h3>
+                        <p>Canva, Microsoft Word, Microsoft PowerPoint, Google Docs, Google Slides</p>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Spoken Languages</h3>
+                        <p>Bahasa Indonesia (native), English (professional working proficiency)</p>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
+    <!--Menambahkan bagian footer yang berisi penutup portofolio saya.-->
     <footer class="site-footer">
         <div class="container">
             <p>&copy; 2026 Burhan. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
