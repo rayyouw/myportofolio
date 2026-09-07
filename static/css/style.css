@@ -126,6 +126,10 @@ section[id] {
 
 /* Navbar menyesuaikan jadi wrap dan lebih ramping di layar sempit */
 @media (max-width: 700px) {
+    section[id] {
+        scroll-margin-top: 9rem;
+    }
+
     .navbar-pill {
         flex-wrap: wrap;
         justify-content: center;
