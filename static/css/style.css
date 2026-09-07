@@ -47,7 +47,7 @@ section[id] {
     text-align: center;
 }
 
-/* ===== NAVBAR ===== */
+/*  NAVBAR  */
 
 /* Header dibuat fixed di atas layar agar navbar selalu terlihat saat scroll */
 .site-header {
@@ -142,7 +142,7 @@ section[id] {
     }
 }
 
-/* ===== HERO ===== */
+/* HERO */
 
 /* Jarak atas diperbesar supaya konten hero tidak tertutup navbar fixed */
 .hero {
@@ -344,7 +344,7 @@ section[id] {
     color: var(--paper);
 }
 
-/* ===== CAROUSEL ===== */
+/* CAROUSEL */
 
 /* Wrapper carousel foto dengan overflow disembunyikan agar animasi geser terlihat rapi */
 .carousel-wrapper {
@@ -384,7 +384,7 @@ section[id] {
     100% { transform: translateX(-50%); }
 }
 
-/* ===== SECTIONS ===== */
+/* SECTIONS */
 
 /* Jarak vertikal seragam untuk tiap section utama halaman */
 .education-section,
@@ -556,7 +556,7 @@ section[id] {
     color: var(--text-muted);
 }
 
-/* ===== EXPERIENCE TIMELINE (visual only, no filter) ===== */
+/* EXPERIENCE TIMELINE (visual only, no filter) */
 
 /* Container timeline diberi ruang kiri untuk tempat garis dan dot */
 .timeline {
@@ -605,7 +605,7 @@ section[id] {
     }
 }
 
-/* ===== ITEM ROW & ICONS ===== */
+/* ITEM ROW & ICONS */
 
 /* Baris berisi ikon/logo dan teks judul disejajarkan horizontal */
 .item-row {
@@ -660,7 +660,7 @@ section[id] {
     line-height: 1.3;
 }
 
-/* ===== FOOTER ===== */
+/* FOOTER */
 
 /* Footer diberi border atas dan teks kecil berwarna redup */
 .site-footer {
@@ -670,7 +670,7 @@ section[id] {
     border-top: 1px solid var(--line);
 }
 
-/* ===== RESPONSIVE ===== */
+/* RESPONSIVE  */
 
 /* Semua grid daftar konten diturunkan jadi satu kolom penuh di layar sempit */
 @media (max-width: 600px) {
