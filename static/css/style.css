@@ -151,7 +151,7 @@ section[id] {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    padding: 7rem 0 5rem;
+    padding: 10rem 0 5rem;
 }
 
 /* Tata letak grid dua kolom untuk identitas, detail teks, dan foto profil */
