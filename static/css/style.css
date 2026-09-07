@@ -105,6 +105,7 @@ section[id] {
     font-size: 0.85rem;
     color: var(--text-muted);
     text-decoration: none;
+    white-space: nowrap;
     transition: color 0.2s ease, transform 0.2s ease, text-shadow 0.2s ease;
     display: inline-block;
 }
@@ -143,8 +144,14 @@ section[id] {
     }
     .navbar-pill nav {
         gap: 1rem;
-        flex-wrap: wrap;
-        justify-content: center;
+        max-width: 100%;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+    .navbar-pill nav::-webkit-scrollbar {
+        display: none;
     }
 }
 
@@ -831,7 +838,7 @@ section[id] {
     .hero {
         min-height: auto;
         align-items: initial;
-        padding: 6rem 0 3rem;
+        padding: 9rem 0 3rem;
     }
 
     .hero-grid {
