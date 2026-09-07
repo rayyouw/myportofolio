@@ -34,16 +34,18 @@ section[id] {
 
 /* Wrapper konten dengan lebar maksimum dan margin tengah untuk semua section */
 .container {
-    max-width: 960px;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0 2rem;
 }
 
 /* Wrapper khusus footer dengan teks rata tengah */
 .container-closure {
-    max-width: 960px;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0 2rem;
     text-align: center;
 }
 
@@ -146,6 +148,9 @@ section[id] {
 
 /* Jarak atas diperbesar supaya konten hero tidak tertutup navbar fixed */
 .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
     padding: 7rem 0 5rem;
 }
 
@@ -349,11 +354,11 @@ section[id] {
 /* Wrapper carousel foto dengan overflow disembunyikan agar animasi geser terlihat rapi */
 .carousel-wrapper {
     width: 100%;
-    max-width: 960px;
+    max-width: none;
     margin: 0 auto;
     overflow: hidden;
     position: relative;
-    padding: 30px 1.5rem;
+    padding: 30px 0;
 }
 
 /* Track carousel berisi gambar-gambar yang bergerak otomatis secara horizontal */
@@ -535,6 +540,137 @@ section[id] {
     margin-top: 0.5rem;
 }
 
+/* PROJECTS */
+
+.image-project {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 12px;
+    flex-shrink: 0;
+    margin-bottom: 1.25rem;
+}
+/* Jarak vertikal untuk section projects, sama seperti section lainnya */
+.projects-section {
+    padding: 2rem 0 2rem;
+}
+
+/* Judul section projects sejajar dengan gaya judul section lain */
+.projects-section h2 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Daftar project disusun satu kolom penuh */
+.projects-list {
+    display: flex;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem;
+}
+
+/* Kartu project*/
+.project-item {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.5rem;
+    background: linear-gradient(145deg, rgba(30, 43, 67, 0.32), rgba(5, 11, 24, 0.08));
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+/* Kartu project terangkat dan border menyala saat di-hover */
+.project-item:hover {
+    border-color: var(--ink);
+    transform: translateY(-3px);
+}
+
+/* Baris badge tag dan tahun disusun sejajar horizontal */
+.project-tags {
+    display: flex;
+    font-size:larger;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Gaya badge kecil untuk tiap kategori/tag project */
+.project-tag {
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--text-muted);
+}
+
+.project-tag:hover{
+    background-color: var(--ink);
+    color: var(--paper);
+}
+
+/* Tahun project ditampilkan rata kanan menjauh dari tag lainnya */
+.project-year {
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+}
+
+/* Judul project dengan ukuran font lebih besar dan jarak bawah yang cukup */
+.project-item h3 {
+    font-size: 1.2rem;
+    line-height: 1.4;
+    margin-bottom: 0.75rem;
+}
+
+/* Daftar poin deskripsi project rata kanan-kiri dengan indentasi */
+.project-item ul {
+    text-align: justify;
+    padding-left: 1.25rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+/* Jarak atas antar poin deskripsi project */
+.project-item li + li {
+    margin-top: 0.5rem;
+}
+
+/* Tombol link menuju detail project (misalnya dokumen di Google Drive) */
+.project-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    align-self: flex-start;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 0.6rem 1.1rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Warna tombol link project berbalik (invert) saat di-hover */
+.project-link:hover {
+    background-color: var(--ink);
+    color: var(--paper);
+}
+
+/* Ukuran ikon panah di dalam tombol link project */
+.project-link svg {
+    width: 14px;
+    height: 14px;
+}
+
 /* Judul entri awards dengan pemotongan kata otomatis jika terlalu panjang */
 .awards-item h3 {
     font-size: 1.15rem;
@@ -555,8 +691,6 @@ section[id] {
     padding-left: 1.25rem;
     color: var(--text-muted);
 }
-
-/* EXPERIENCE TIMELINE (visual only, no filter) */
 
 /* Container timeline diberi ruang kiri untuk tempat garis dan dot */
 .timeline {
