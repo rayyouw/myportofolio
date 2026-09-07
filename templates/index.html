@@ -13,17 +13,17 @@
 <body>
     <!--Menambahkan bagian header yang berisi navigasi ke bagian profile, education, projects, awards, skills, dan contact-->
     <header class="site-header">
-        <div class="container">
-            <a href="#profile" class="brand">Rayyouw</a>
-            <nav>
-                <a href="#profile">Profile</a>
-                <a href="#education">Education</a>
-                <a href="#experience">Experience</a>
-                <a href="#projects">Projects</a>
-                <a href="#awards">Awards</a>
-                <a href="#skills">Skills</a>
-            </nav>
-        </div>
+    <div class="navbar-pill">
+        <div class="navbar-dot"></div>
+        <a href="#profile" class="brand">Rayyouw</a>
+        <nav>
+            <a href="#profile">Profile</a>
+            <a href="#education">Education</a>
+            <a href="#experience">Experience</a>
+            <a href="#awards">Awards</a>
+            <a href="#skills">Skills</a>
+        </nav>
+    </div>
     </header>
 
     <!--Menambahkan bagian profile yang berisi pengenalan singkat mengenai saya-->
@@ -38,7 +38,7 @@
                 <img class="avatar" src="/static/img/profile-photo.jpeg" alt="Photo of Rayhan">
             </div>
             <div class="hero-details">
-                <p class="bio">Computer Science student at Universitas Indonesia. Managed <strong class="bio-highlight bio-number">4+</strong> event projects and was involved in <strong class="bio-highlight bio-number">3+</strong> organizations and committees. Currently focusing on <strong class="bio-highlight">Data Science</strong> and <strong class="bio-highlight">Artificial Intelligence</strong> through competitions such as <strong class="bio-highlight">GEMASTIK</strong> and <strong class="bio-highlight">SATRIA DATA</strong>.</p>
+                <p class="bio">Teaching Assistant and Computer Science student at Universitas Indonesia. Managed <strong class="bio-highlight bio-number">4+</strong> event projects and was involved in <strong class="bio-highlight bio-number">3+</strong> organizations and committees. Currently focusing on <strong class="bio-highlight">Data Science</strong> and <strong class="bio-highlight">Artificial Intelligence</strong> through competitions such as <strong class="bio-highlight">GEMASTIK</strong> and <strong class="bio-highlight">SATRIA DATA</strong>.</p>
                 <dl class="meta-list">
                     <div class="meta-row">
                         <dt>NPM</dt>
@@ -51,7 +51,7 @@
                 </dl>
 
                 <div class="cv-actions">
-                    <a href="c:\myportofolio\static\cv\cv-rayhan.pdf" class="btn-cv" download="rayhan-cv.pdf">
+                    <a href="/static/cv/cv-rayhan.pdf" class="btn-cv" download="CV_RayhanFairuzAqram.pdf">
                         <svg class="btn-cv-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                             <path d="M14 2v6h6"/>
@@ -89,7 +89,7 @@
             <img src="/static/img/oh-2.jpeg" alt="foto 3">
             <img src="/static/img/explore-2.jpeg" alt="foto 4">
             <img src="/static/img/bem-2.jpeg" alt="foto 5">
-        
+
             <!-- Set 2: duplikat, WAJIB sama persis biar loop-nya mulus -->
             <img src="/static/img/oh-1.jpeg" alt="foto 1">
             <img src="/static/img/compfest-2.jpeg" alt="foto 2">
@@ -98,6 +98,7 @@
             <img src="/static/img/bem-2.jpeg" alt="foto 5">
         </div>
     </div>
+
     <!--Menambahkan bagian education yang berisi riwayat pendidikan saya-->
     <section class="education-section" id="education">
         <div class="container">
@@ -126,8 +127,8 @@
     <section class="experience-section" id="experience">
         <div class="container">
             <h2>EXPERIENCES</h2>
-            <div class="experience-list">
-                <article class="experience-item">
+            <div class="experience-list timeline">
+                <article class="experience-item timeline-item">
                     <div class="item-row">
                         <img class="item-icon" src="/static/img/logo-fasilkom-ui.jpg" alt="Logo Fasilkom UI">
                         <div class="item-text">
@@ -144,7 +145,7 @@
                     </ul>
                 </article>
 
-                <article class="experience-item">
+                <article class="experience-item timeline-item">
                     <div class="item-row">
                         <img class="item-icon" src="/static/img/bem-fasilkom.png" alt="Logo BEM Fasilkom UI">
                         <div class="item-text">
@@ -161,7 +162,7 @@
                     </ul>
                 </article>
 
-                <article class="experience-item">
+                <article class="experience-item timeline-item">
                     <div class="item-row">
                         <img class="item-icon" src="/static/img/logo-compfest.png" alt="Logo Compfest 18">
                         <div class="item-text">
@@ -173,12 +174,12 @@
                         </div>
                     </div>
                     <ul>
-                        <li>Selected as Person in Charge (PIC) for the Seminar and Workshop at Xcelerate Batch 2, leading concept creation and speaker/partner outreach from Osnova Company.</li>
+                        <li>Served as Person in Charge (PIC) for the Seminar and Workshop at Xcelerate Batch 2, leading concept creation and speaker/partner outreach from @Osnova.</li>
                         <li>Coordinated cross-functional operations across multiple teams, including Marketing, Operational, and IT Development, to ensure seamless event execution.</li>
                     </ul>
                 </article>
 
-                <article class="experience-item">
+                <article class="experience-item timeline-item">
                     <div class="item-row">
                         <img class="item-icon" src="/static/img/logo-arung.png" alt="Logo ARUNG Fasilkom UI">
                         <div class="item-text">
@@ -194,7 +195,7 @@
                     </ul>
                 </article>
 
-                <article class="experience-item">
+                <article class="experience-item timeline-item">
                     <div class="item-row">
                         <img class="item-icon" src="/static/img/logo-oh-2.png" alt="Logo Open House Fasilkom UI">
                         <div class="item-text">
@@ -206,8 +207,8 @@
                         </div>
                     </div>
                     <ul>
-                        <li>Served as Person in Charge (PIC) for a fun coding event with 2,700+ registrants, managing participant relations and cross-team coordination.</li>
-                        <li>Served as Person in Charge (PIC) for a parents' talk show with 100+ registrants, leading end-to-end event planning and execution.</li>
+                        <li>Served as Person in Charge (PIC) for fun coding event with 2,700+ registrants, managing participant relations and cross-team coordination.</li>
+                        <li>Served as Person in Charge (PIC) for parents' talk show with 100+ registrants, leading end-to-end event planning and execution.</li>
                     </ul>
                 </article>
             </div>
@@ -274,75 +275,89 @@
             <h2>SKILLS</h2>
             <div class="skills-list">
                 <div class="skill-category">
-                    <div class="skill-heading">
-                        <span class="skill-number">01</span>
-                        <h3>Programming</h3>
-                    </div>
+                    <h3><span class="skill-number">01</span> Programming</h3>
                     <div class="item-skills-list">
                         <div class="item-skills">
-                            <img class="item-icon" src="/static/img/python.png" alt="Logo OSN Matematika">
+                            <img class="item-icon" src="/static/img/python.png" alt="Python">
                             <span>Python</span>
                         </div>
                         <div class="item-skills">
-                            <img class="item-icon" src="/static/img/c++.png" alt="Logo OSN Matematika">
+                            <img class="item-icon" src="/static/img/c++.png" alt="C++">
                             <span>C++</span>
                         </div>
                         <div class="item-skills">
-                            <img class="item-icon" src="/static/img/java.png" alt="Logo OSN Matematika">
+                            <img class="item-icon" src="/static/img/java.png" alt="Java">
                             <span>Java</span>
                         </div>
                         <div class="item-skills">
-                            <img class="item-icon" src="/static/img/html.png" alt="Logo OSN Matematika">
+                            <img class="item-icon" src="/static/img/html.png" alt="HTML">
                             <span>HTML</span>
                         </div>
                         <div class="item-skills">
-                            <img class="item-icon" src="/static/img/css.png" alt="Logo OSN Matematika">
+                            <img class="item-icon" src="/static/img/css.png" alt="CSS">
                             <span>CSS</span>
                         </div>
-
                     </div>
                 </div>
+
                 <div class="skill-category">
-                    <div class="skill-heading">
-                        <span class="skill-number">02</span>
-                        <h3>Data &amp; Machine Learning</h3>
-                    </div>
+                    <h3><span class="skill-number">02</span> Data &amp; Machine Learning</h3>
                     <div class="item-skills-list">
                         <div class="item-skills">
-                            <img class="item-icon" src="/static/img/pandas.png" alt="Logo OSN Matematika">
+                            <img class="item-icon" src="/static/img/pandas.png" alt="pandas">
                             <span>pandas</span>
                         </div>
                         <div class="item-skills">
-                            <img class="item-icon" src="/static/img/numpy.png" alt="Logo OSN Matematika">
+                            <img class="item-icon" src="/static/img/numpy.png" alt="NumPy">
                             <span>NumPy</span>
                         </div>
                         <div class="item-skills">
-                            <img class="item-icon" src="/static/img/scikit-learn.png" alt="Logo OSN Matematika">
+                            <img class="item-icon" src="/static/img/scikit-learn.png" alt="scikit-learn">
                             <span>scikit-learn</span>
                         </div>
                         <div class="item-skills">
-                            <img class="item-icon" src="/static/img/pytorch.png" alt="Logo OSN Matematika">
+                            <img class="item-icon" src="/static/img/pytorch.png" alt="PyTorch">
                             <span>PyTorch</span>
                         </div>
                     </div>
                 </div>
+
                 <div class="skill-category">
-                    <div class="skill-heading">
-                        <span class="skill-number">03</span>
-                        <h3>Tools &amp; Productivity</h3>
-                    </div>
+                    <h3><span class="skill-number">03</span> Tools &amp; Productivity</h3>
                     <div class="item-skills-list">
                         <div class="item-skills">
-                            <img class="item-icon" src="/static/img/canva.png" alt="Logo OSN Matematika">
+                            <img class="item-icon" src="/static/img/canva.png" alt="Canva">
                             <span>Canva</span>
                         </div>
                         <div class="item-skills">
-                            <img class="item-icon" src="/static/img/microsoft-office.png" alt="Logo OSN Matematika">
+                            <img class="item-icon" src="/static/img/microsoft-office.png" alt="Microsoft Office">
                             <span>Microsoft Office</span>
                         </div>
                         <div class="item-skills">
-                            <img class="item-icon" src="/static/img/google-workspace.png" alt="Logo OSN Matematika">
+                            <img class="item-icon" src="/static/img/google-workspace.png" alt="Google Workspace">
                             <span>Google Workspace</span>
+                        </div>
+                        <div class="item-skills">
+                            <img class="item-icon" src="/static/img/colab.png" alt="Google Colab">
+                            <span>Google Colab</span>
+                        </div>
+                        <div class="item-skills">
+                            <img class="item-icon" src="/static/img/vscode.png" alt="Visual Studio Code">
+                            <span>Visual Studio Code</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3><span class="skill-number">04</span> Spoken Languages</h3>
+                    <div class="item-skills-list">
+                        <div class="item-skills">
+                            <img class="item-icon" src="/static/img/indonesia.png" alt="Bahasa Indonesia">
+                            <span>Bahasa Indonesia &middot; Native</span>
+                        </div>
+                        <div class="item-skills">
+                            <img class="item-icon" src="/static/img/english.jpg" alt="English">
+                            <span>English &middot; Professional</span>
                         </div>
                     </div>
                 </div>
