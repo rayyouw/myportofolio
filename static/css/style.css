@@ -824,6 +824,12 @@ section[id] {
 
 /* Hero section disusun ulang jadi satu kolom vertikal (judul, foto, detail) di layar sempit */
 @media (max-width: 600px) {
+    .hero {
+        min-height: auto;
+        align-items: initial;
+        padding: 6rem 0 3rem;
+    }
+
     .hero-grid {
         grid-template-columns: 1fr;
         grid-template-areas:
