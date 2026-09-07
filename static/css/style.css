@@ -1,9 +1,11 @@
+/* Reset default margin, padding, dan box-sizing agar konsisten di semua elemen */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Variabel warna dan ukuran global yang dipakai di seluruh halaman */
 :root {
     --ink: #f4f7fb;
     --paper: #050b18;
@@ -12,6 +14,7 @@
     --radius: 4px;
 }
 
+/* Pengaturan dasar body: font, warna teks, warna latar, dan jarak antar baris */
 body {
     font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: var(--ink);
@@ -19,20 +22,24 @@ body {
     line-height: 1.6;
 }
 
+/* Font khusus untuk judul utama dan brand navbar */
 h1, .brand {
     font-family: "Space Grotesk", -apple-system, sans-serif;
 }
 
+/* Memberi jarak scroll ke atas supaya judul section tidak tertutup navbar fixed saat diklik dari navigasi */
 section[id] {
     scroll-margin-top: 3rem;
 }
 
+/* Wrapper konten dengan lebar maksimum dan margin tengah untuk semua section */
 .container {
     max-width: 960px;
     margin: 0 auto;
     padding: 0 1.5rem;
 }
 
+/* Wrapper khusus footer dengan teks rata tengah */
 .container-closure {
     max-width: 960px;
     margin: 0 auto;
@@ -41,6 +48,8 @@ section[id] {
 }
 
 /* ===== NAVBAR ===== */
+
+/* Header dibuat fixed di atas layar agar navbar selalu terlihat saat scroll */
 .site-header {
     position: fixed;
     top: 0;
@@ -52,6 +61,7 @@ section[id] {
     justify-content: center;
 }
 
+/* Bentuk pill/kapsul untuk navbar dengan efek blur transparan */
 .navbar-pill {
     display: flex;
     align-items: center;
@@ -66,6 +76,7 @@ section[id] {
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
+/* Titik kecil bercahaya di sisi kiri navbar sebagai aksen visual */
 .navbar-dot {
     width: 7px;
     height: 7px;
@@ -75,16 +86,19 @@ section[id] {
     flex-shrink: 0;
 }
 
+/* Nama/brand di navbar didorong ke kiri dengan margin-right auto */
 .navbar-pill .brand {
     font-size: 1.05rem;
     margin-right: auto;
 }
 
+/* Daftar link navigasi disusun sejajar horizontal dengan jarak antar item */
 .navbar-pill nav {
     display: flex;
     gap: 1.75rem;
 }
 
+/* Gaya dasar tiap link navigasi sebelum di-hover */
 .navbar-pill nav a {
     font-size: 0.85rem;
     color: var(--text-muted);
@@ -93,12 +107,14 @@ section[id] {
     display: inline-block;
 }
 
+/* Efek hover link navigasi: teks naik sedikit dan memancarkan glow cyan */
 .navbar-pill nav a:hover {
     color: #4fe0ff;
     transform: translateY(-2px);
     text-shadow: 0 0 8px rgba(79, 224, 255, 0.7);
 }
 
+/* Gaya umum untuk brand/nama di luar navbar-pill */
 .brand {
     font-size: 1.3rem;
     font-weight: 700;
@@ -106,6 +122,7 @@ section[id] {
     text-decoration: none;
 }
 
+/* Navbar menyesuaikan jadi wrap dan lebih ramping di layar sempit */
 @media (max-width: 700px) {
     .navbar-pill {
         flex-wrap: wrap;
@@ -126,10 +143,13 @@ section[id] {
 }
 
 /* ===== HERO ===== */
+
+/* Jarak atas diperbesar supaya konten hero tidak tertutup navbar fixed */
 .hero {
     padding: 7rem 0 5rem;
 }
 
+/* Tata letak grid dua kolom untuk identitas, detail teks, dan foto profil */
 .hero-grid {
     display: grid;
     grid-template-columns: 1.3fr 1fr;
@@ -139,14 +159,17 @@ section[id] {
     gap: 1.5rem 3rem;
 }
 
+/* Menempatkan blok identitas (judul) ke area grid "identity" */
 .hero-identity {
     grid-area: identity;
 }
 
+/* Menempatkan blok detail (bio, meta, tombol) ke area grid "details" */
 .hero-details {
     grid-area: details;
 }
 
+/* Teks kecil di atas judul utama sebagai penanda kategori/afiliasi */
 .hero-kicker {
     font-size: 0.85rem;
     letter-spacing: 0.08em;
@@ -156,11 +179,13 @@ section[id] {
     margin-bottom: 0.75rem;
 }
 
+/* Ukuran judul utama menyesuaikan lebar layar secara responsif */
 .hero-identity h1 {
     font-size: clamp(3rem, 7vw, 5rem);
     line-height: 0.95;
 }
 
+/* Paragraf bio dengan lebar terbatas dan perataan justify agar mudah dibaca */
 .bio {
     color: var(--text-muted);
     max-width: 480px;
@@ -168,11 +193,13 @@ section[id] {
     text-align: justify;
 }
 
+/* Menyorot kata kunci tertentu di dalam bio dengan warna aksen */
 .bio-highlight {
     color: var(--accent-dark);
     font-weight: 700;
 }
 
+/* Menyorot angka statistik di bio dengan badge berwarna */
 .bio-number {
     display: inline-block;
     color: var(--ink);
@@ -182,12 +209,14 @@ section[id] {
     line-height: 1.25;
 }
 
+/* Daftar meta info (NPM, Program Studi) disusun sejajar horizontal */
 .meta-list {
     display: flex;
     gap: 2rem;
     margin-bottom: 1.5rem;
 }
 
+/* Label meta info ditulis kecil, huruf kapital, dan berwarna redup */
 .meta-row dt {
     font-size: 0.75rem;
     text-transform: uppercase;
@@ -196,16 +225,19 @@ section[id] {
     margin-bottom: 0.15rem;
 }
 
+/* Nilai meta info ditebalkan agar lebih menonjol dari labelnya */
 .meta-row dd {
     font-weight: 600;
 }
 
+/* Kumpulan tautan sosial media disusun sejajar dan bisa wrap ke baris baru */
 .social-links {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
 }
 
+/* Gaya tombol untuk tiap tautan sosial media */
 .social-link {
     display: inline-block;
     font-size: 0.85rem;
@@ -218,16 +250,19 @@ section[id] {
     transition: background-color 0.2s ease;
 }
 
+/* Warna latar tombol sosial berubah saat di-hover */
 .social-link:hover {
     background-color: var(--accent);
 }
 
+/* Wrapper foto profil ditempatkan di area grid "photo" dan disejajarkan ke tengah */
 .hero-photo {
     grid-area: photo;
     align-self: center;
     position: relative;
 }
 
+/* Blok warna aksen di belakang foto sebagai elemen dekoratif berlapis */
 .photo-block {
     position: absolute;
     top: 1.25rem;
@@ -239,6 +274,7 @@ section[id] {
     z-index: 0;
 }
 
+/* Foto profil ditampilkan persegi dengan border dan berada di lapisan paling atas */
 .avatar {
     position: relative;
     z-index: 1;
@@ -250,12 +286,14 @@ section[id] {
     border: 3px solid var(--ink);
 }
 
+/* Tombol CV dan ikon sosial disusun sejajar dengan jarak antar elemen */
 .cv-actions {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
+/* Gaya tombol utama untuk mengunduh/melihat CV */
 .btn-cv {
     display: inline-flex;
     align-items: center;
@@ -270,15 +308,18 @@ section[id] {
     transition: opacity 0.2s ease;
 }
 
+/* Tombol CV sedikit transparan saat di-hover sebagai umpan balik visual */
 .btn-cv:hover {
     opacity: 0.85;
 }
 
+/* Ukuran ikon dokumen di dalam tombol CV */
 .btn-cv-icon {
     width: 16px;
     height: 16px;
 }
 
+/* Tombol ikon bulat untuk LinkedIn, GitHub, dan Email */
 .icon-btn {
     display: inline-flex;
     align-items: center;
@@ -291,17 +332,21 @@ section[id] {
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Ukuran ikon SVG di dalam tombol ikon bulat */
 .icon-btn svg {
     width: 18px;
     height: 18px;
 }
 
+/* Warna tombol ikon berbalik (invert) saat di-hover */
 .icon-btn:hover {
     background-color: var(--ink);
     color: var(--paper);
 }
 
 /* ===== CAROUSEL ===== */
+
+/* Wrapper carousel foto dengan overflow disembunyikan agar animasi geser terlihat rapi */
 .carousel-wrapper {
     width: 100%;
     max-width: 960px;
@@ -311,6 +356,7 @@ section[id] {
     padding: 30px 1.5rem;
 }
 
+/* Track carousel berisi gambar-gambar yang bergerak otomatis secara horizontal */
 .carousel-track {
     display: flex;
     gap: 20px;
@@ -318,10 +364,12 @@ section[id] {
     animation: scroll 15s linear infinite;
 }
 
+/* Animasi carousel berhenti sementara saat kursor diarahkan ke atasnya */
 .carousel-wrapper:hover .carousel-track {
     animation-play-state: paused;
 }
 
+/* Ukuran dan bentuk seragam untuk setiap gambar di dalam carousel */
 .carousel-track img {
     height: 300px;
     width: 400px;
@@ -330,12 +378,15 @@ section[id] {
     flex-shrink: 0;
 }
 
+/* Animasi menggeser track carousel dari posisi awal ke setengah lebarnya agar terlihat looping mulus */
 @keyframes scroll {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
 }
 
 /* ===== SECTIONS ===== */
+
+/* Jarak vertikal seragam untuk tiap section utama halaman */
 .education-section,
 .experience-section,
 .awards-section,
@@ -343,6 +394,7 @@ section[id] {
     padding: 2rem 0 2rem;
 }
 
+/* Judul tiap section ditata sejajar dengan ikon/elemen tambahan di sampingnya */
 .education-section h2,
 .experience-section h2,
 .awards-section h2,
@@ -354,6 +406,7 @@ section[id] {
     font-size: 1.5rem;
 }
 
+/* Semua daftar konten menggunakan CSS Grid sebagai dasar tata letak */
 .education-list,
 .experience-list,
 .awards-list,
@@ -361,26 +414,31 @@ section[id] {
     display: grid;
 }
 
+/* Daftar education hanya satu kolom penuh */
 .education-list {
     grid-template-columns: minmax(0, 1fr);
 }
 
+/* Daftar experience satu kolom penuh dengan jarak antar item dan tinggi kartu yang seragam */
 .experience-list {
     grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
     align-items: stretch;
 }
 
+/* Daftar awards ditampilkan dalam tiga kolom sejajar */
 .awards-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
 }
 
+/* Daftar skills ditampilkan dalam dua kolom sejajar */
 .skills-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
 }
 
+/* Gaya kartu umum (border, gradient, padding) yang dipakai di semua jenis item konten */
 .education-item,
 .experience-item,
 .awards-item,
@@ -395,6 +453,7 @@ section[id] {
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
+/* Kartu sedikit terangkat dan border menyala saat di-hover */
 .education-item:hover,
 .experience-item:hover,
 .awards-item:hover,
@@ -403,79 +462,94 @@ section[id] {
     transform: translateY(-3px);
 }
 
+/* Judul kategori skill dengan ukuran font dan jarak bawah tertentu */
 .skill-category h3 {
     font-size: 1.15rem;
     margin-bottom: 0.5rem;
 }
 
+/* Nomor urut kategori skill ditampilkan lebih kecil dan sedikit transparan */
 .skill-number {
     font-size: 0.75rem;
     opacity: 0.7;
 }
 
+/* Teks deskripsi pada kategori skill dan item awards berwarna redup */
 .skill-category p,
 .awards-item p {
     color: var(--text-muted);
 }
 
+/* Judul entri education dengan ukuran font tertentu */
 .education-item h3 {
     font-size: 1.15rem;
 }
 
+/* Subjudul entri education berwarna redup dengan jarak atas-bawah */
 .education-item h4 {
     margin: 0.25rem 0 0.75rem;
     color: var(--text-muted);
     font-size: 0.95rem;
 }
 
+/* Daftar poin di entri education rata kanan-kiri dengan indentasi */
 .education-item ul {
     text-align: justify;
     padding-left: 1.25rem;
     color: var(--text-muted);
 }
 
+/* Judul dan tanggal pada entri experience disejajarkan berlawanan arah (kiri-kanan) */
 .experience-heading {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
 }
 
+/* Judul entri experience dengan ukuran font tertentu */
 .experience-item h3 {
     font-size: 1.15rem;
 }
 
+/* Tanggal dan subjudul entri experience berwarna redup */
 .experience-heading p,
 .experience-item h4 {
     color: var(--text-muted);
 }
 
+/* Subjudul entri experience dengan jarak atas-bawah */
 .experience-item h4 {
     margin: 0.25rem 0 0.75rem;
     font-size: 0.95rem;
 }
 
+/* Daftar poin di entri experience rata kanan-kiri dengan indentasi */
 .experience-item ul {
     text-align: justify;
     padding-left: 1.25rem;
     color: var(--text-muted);
 }
 
+/* Jarak atas antar poin daftar berurutan di entri experience */
 .experience-item li + li {
     margin-top: 0.5rem;
 }
 
+/* Judul entri awards dengan pemotongan kata otomatis jika terlalu panjang */
 .awards-item h3 {
     font-size: 1.15rem;
     margin: 0.25rem 0 0.75rem;
     overflow-wrap: anywhere;
 }
 
+/* Subjudul entri awards berwarna redup dengan jarak atas-bawah */
 .awards-item h4 {
     margin: 0.25rem 0 0.75rem;
     color: var(--text-muted);
     font-size: 0.95rem;
 }
 
+/* Daftar poin di entri awards rata kanan-kiri dengan indentasi */
 .awards-item ul {
     text-align: justify;
     padding-left: 1.25rem;
@@ -483,11 +557,14 @@ section[id] {
 }
 
 /* ===== EXPERIENCE TIMELINE (visual only, no filter) ===== */
+
+/* Container timeline diberi ruang kiri untuk tempat garis dan dot */
 .timeline {
     position: relative;
     padding-left: 2.5rem;
 }
 
+/* Garis vertikal bergradasi warna sebagai tulang punggung timeline */
 .timeline::before {
     content: "";
     position: absolute;
@@ -499,10 +576,12 @@ section[id] {
     box-shadow: 0 0 8px rgba(79, 224, 255, 0.6);
 }
 
+/* Setiap item timeline dijadikan posisi relatif agar dot bisa ditempatkan presisi */
 .timeline-item {
     position: relative;
 }
 
+/* Titik bulat bercahaya di sisi kiri tiap item sebagai penanda timeline */
 .timeline-item::before {
     content: "";
     position: absolute;
@@ -516,6 +595,7 @@ section[id] {
     z-index: 1;
 }
 
+/* Timeline menyesuaikan jarak dan posisi dot agar tetap rapi di layar sempit */
 @media (max-width: 600px) {
     .timeline {
         padding-left: 1.75rem;
@@ -526,6 +606,8 @@ section[id] {
 }
 
 /* ===== ITEM ROW & ICONS ===== */
+
+/* Baris berisi ikon/logo dan teks judul disejajarkan horizontal */
 .item-row {
     display: flex;
     align-items: center;
@@ -534,6 +616,7 @@ section[id] {
     min-width: 0;
 }
 
+/* Daftar item skill (ikon + nama) disusun sejajar dan bisa wrap ke baris baru */
 .item-skills-list {
     margin-top: 10px;
     display: flex;
@@ -542,6 +625,7 @@ section[id] {
     align-items: center;
 }
 
+/* Satu item skill terdiri dari ikon dan teks yang disejajarkan horizontal */
 .item-skills {
     display: flex;
     align-items: center;
@@ -549,6 +633,7 @@ section[id] {
     flex-shrink: 0;
 }
 
+/* Ukuran dan bentuk seragam untuk semua ikon/logo kecil (organisasi, skill, dll) */
 .item-icon {
     width: 42px;
     height: 42px;
@@ -557,6 +642,7 @@ section[id] {
     flex-shrink: 2;
 }
 
+/* Blok teks di samping ikon disusun vertikal dan bisa memotong kata panjang */
 .item-text {
     flex: 1;
     min-width: 0;
@@ -567,6 +653,7 @@ section[id] {
     gap: 0.2rem;
 }
 
+/* Judul dan subjudul di dalam item-text tidak memiliki margin bawaan */
 .item-text h3,
 .item-text h4 {
     margin: 0;
@@ -574,6 +661,8 @@ section[id] {
 }
 
 /* ===== FOOTER ===== */
+
+/* Footer diberi border atas dan teks kecil berwarna redup */
 .site-footer {
     padding: 1.5rem;
     color: var(--text-muted);
@@ -582,6 +671,8 @@ section[id] {
 }
 
 /* ===== RESPONSIVE ===== */
+
+/* Semua grid daftar konten diturunkan jadi satu kolom penuh di layar sempit */
 @media (max-width: 600px) {
     .experience-list,
     .awards-list,
@@ -597,6 +688,7 @@ section[id] {
     }
 }
 
+/* Hero section disusun ulang jadi satu kolom vertikal (judul, foto, detail) di layar sempit */
 @media (max-width: 600px) {
     .hero-grid {
         grid-template-columns: 1fr;
