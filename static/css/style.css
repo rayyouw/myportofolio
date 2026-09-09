@@ -404,7 +404,6 @@ section[id] {
 
 /* Jarak vertikal seragam untuk tiap section utama halaman */
 .education-section,
-.experience-section,
 .awards-section,
 .skills-section {
     padding: 2rem 0 2rem;
@@ -478,6 +477,30 @@ section[id] {
     transform: translateY(-3px);
 }
 
+/* Gaya kartu umum (border, gradient, padding) yang dipakai di semua jenis item konten */
+.education-item,
+.experience-item,
+.awards-item,
+.skill-category {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.25rem;
+    background: linear-gradient(145deg, rgba(30, 43, 67, 0.32), rgba(5, 11, 24, 0.08));
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+/* Kartu sedikit terangkat dan border menyala saat di-hover */
+.education-item:hover,
+.experience-item:hover,
+.awards-item:hover,
+.skill-category:hover {
+    border-color: var(--ink);
+    transform: translateY(-3px);
+}
+
 /* Judul kategori skill dengan ukuran font dan jarak bawah tertentu */
 .skill-category h3 {
     font-size: 1.15rem;
@@ -523,31 +546,36 @@ section[id] {
 }
 
 /* Judul entri experience dengan ukuran font tertentu */
-.experience-item h3 {
+.experience-item h3,
+.experience-card h2 {
     font-size: 1.15rem;
 }
 
 /* Tanggal dan subjudul entri experience berwarna redup */
 .experience-heading p,
-.experience-item h4 {
+.experience-item h4,
+.experience-card h3 {
     color: var(--text-muted);
 }
 
 /* Subjudul entri experience dengan jarak atas-bawah */
-.experience-item h4 {
+.experience-item h4,
+.experience-card h3 {
     margin: 0.25rem 0 0.75rem;
     font-size: 0.95rem;
 }
 
 /* Daftar poin di entri experience rata kanan-kiri dengan indentasi */
-.experience-item ul {
+.experience-item ul,
+.experience-card ul {
     text-align: justify;
     padding-left: 1.25rem;
     color: var(--text-muted);
 }
 
 /* Jarak atas antar poin daftar berurutan di entri experience */
-.experience-item li + li {
+.experience-item li + li,
+.experience-card li + li {
     margin-top: 0.5rem;
 }
 
@@ -860,4 +888,57 @@ section[id] {
     .experience-heading {
         display: block;
     }
+}
+
+.experience-section {
+    padding: 2rem 0;
+    border-top: 1px solid var(--line);
+}
+
+.section-kicker {
+    color: var(--accent-dark);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.experience-section h1 {
+    margin: 0.4rem 0 1.5rem;
+    font-size: 2rem;
+}
+
+.experience-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.experience-card {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 280px;
+    min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.25rem;
+    background: linear-gradient(145deg, rgba(30, 43, 67, 0.32), rgba(5, 11, 24, 0.08));
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.experience-category {
+    color: var(--accent-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.experience-card h2 {
+    margin: 0.5rem 0;
+}
+
+.experience-status {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
 }
