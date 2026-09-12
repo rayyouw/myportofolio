@@ -12,6 +12,7 @@
     --line: #1e2b43;
     --text-muted: #a9b5c8;
     --radius: 4px;
+    --header-space: 6rem;
 }
 
 /* Pengaturan dasar body: font, warna teks, warna latar, dan jarak antar baris */
@@ -29,7 +30,7 @@ h1, .brand {
 
 /* Memberi jarak scroll ke atas supaya judul section tidak tertutup navbar fixed saat diklik dari navigasi */
 section[id] {
-    scroll-margin-top: 3rem;
+    scroll-margin-top: var(--header-space);
 }
 
 /* Wrapper konten dengan lebar maksimum dan margin tengah untuk semua section */
@@ -53,7 +54,7 @@ section[id] {
 
 /* Header dibuat fixed di atas layar agar navbar selalu terlihat saat scroll */
 .site-header {
-    position: fixed;
+    position:fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -70,7 +71,7 @@ section[id] {
     gap: 1.5rem;
     max-width: 900px;
     width: 100%;
-    padding: 0.9rem 1.2rem;
+    padding: 0.5rem 1.2rem;
     border-radius: 999px;
     background: rgba(10, 16, 32, 0.75);
     border: 1px solid var(--line);
@@ -128,7 +129,7 @@ section[id] {
 /* Navbar menyesuaikan jadi wrap dan lebih ramping di layar sempit */
 @media (max-width: 700px) {
     section[id] {
-        scroll-margin-top: 9rem;
+        scroll-margin-top: 12rem;
     }
 
     .navbar-pill {
@@ -159,10 +160,10 @@ section[id] {
 
 /* Jarak atas diperbesar supaya konten hero tidak tertutup navbar fixed */
 .hero {
-    min-height: 100vh;
+    min-height: auto;
     display: flex;
-    align-items: center;
-    padding: 10rem 0 5rem;
+    align-items: flex-start;
+    padding: var(--header-space) 0 3rem;
 }
 
 /* Tata letak grid dua kolom untuk identitas, detail teks, dan foto profil */
@@ -220,6 +221,7 @@ section[id] {
     display: inline-block;
     color: var(--ink);
     background-color: var(--accent);
+    font-weight: 700;
     padding: 0 0.25rem;
     border-radius: 2px;
     line-height: 1.25;
@@ -377,7 +379,7 @@ section[id] {
     display: flex;
     gap: 20px;
     width: max-content;
-    animation: scroll 15s linear infinite;
+    animation: scroll 25s linear infinite;
 }
 
 /* Animasi carousel berhenti sementara saat kursor diarahkan ke atasnya */
@@ -401,7 +403,6 @@ section[id] {
 }
 
 /* SECTIONS */
-
 /* Jarak vertikal seragam untuk tiap section utama halaman */
 .education-section,
 .awards-section,
@@ -770,8 +771,12 @@ section[id] {
 
 /* Timeline menyesuaikan jarak dan posisi dot agar tetap rapi di layar sempit */
 @media (max-width: 600px) {
+    :root {
+        --header-space: 9rem;
+    }
+
     .timeline {
-        padding-left: 1.75rem;
+        scroll-margin-top: var(--header-space);
     }
     .timeline-item::before {
         left: -1.75rem;
@@ -847,6 +852,17 @@ section[id] {
 
 /* Semua grid daftar konten diturunkan jadi satu kolom penuh di layar sempit */
 @media (max-width: 600px) {
+    .page-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .page-heading {
+        position: static;
+        z-index: auto;
+        display: block;
+    }
+
     .experience-list,
     .awards-list,
     .skills-list {
@@ -866,7 +882,7 @@ section[id] {
     .hero {
         min-height: auto;
         align-items: initial;
-        padding: 9rem 0 3rem;
+        padding: var(--header-space) 0 3rem;
     }
 
     .hero-grid {
@@ -895,6 +911,36 @@ section[id] {
     border-top: 1px solid var(--line);
 }
 
+.experience-page,
+.awards-page,
+.standalone-page {
+    padding-top: var(--header-space);
+    border-top: 1px solid var(--line);
+}
+
+.page-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    align-items: start;
+}
+
+.page-heading {
+    display: block;
+    width: 100%;
+    padding-bottom: 0rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.page-heading h1,
+.page-heading h2 {
+    margin: 0.1rem 0 0.5rem;
+}
+
+.page-content {
+    min-width: 0;
+}
+
 .section-kicker {
     color: var(--accent-dark);
     font-size: 0.8rem;
@@ -904,6 +950,11 @@ section[id] {
 }
 
 .experience-section h1 {
+    margin: 0.4rem 0 1.5rem;
+    font-size: 2rem;
+}
+
+.awards-page h1 {
     margin: 0.4rem 0 1.5rem;
     font-size: 2rem;
 }

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education - {{ profile.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
+</head>
+<body>
+    <header class="site-header">
+        <div class="navbar-pill">
+            <div class="navbar-dot"></div>
+            <a href="{% url 'main:show_main' %}" class="brand">{{ profile.name }}</a>
+            <nav>
+                <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_education' %}">Education</a>
+                <a href="{% url 'main:show_experience' %}">Experience</a>
+                <a href="{% url 'main:show_awards' %}">Awards</a>
+                <a href="{% url 'main:show_projects' %}">Projects</a>
+                <a href="{% url 'main:show_skills' %}">Skills</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="education-section standalone-page" id="education">
+            <div class="container">
+                <div class="page-grid">
+                    <div class="page-heading">
+                        <h1>EDUCATION</h1>
+                    </div>
+                    <div class="page-content">
+                        <div class="education-list">
+                            {% for education in education_list %}
+                                <article class="education-item">
+                                    <div class="item-row">
+                                        {% if education.thumbnail %}
+                                            <img class="item-icon" src="{{ education.thumbnail }}" alt="{{ education.institution }} logo">
+                                        {% endif %}
+                                        <div class="item-text">
+                                            <div class="experience-heading">
+                                                <h3>{{ education.institution }}</h3>
+                                                <p>{{ education.period }}</p>
+                                            </div>
+                                            <h4>{{ education.degree }}</h4>
+                                        </div>
+                                    </div>
+                                    <ul>
+                                        <li>Course: {% for course in education.courses %}{{ course }}{% if not forloop.last %} | {% endif %}{% endfor %}</li>
+                                    </ul>
+                                </article>
+                            {% empty %}
+                                <p class="empty-state">No education has been added yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

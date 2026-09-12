@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awards - {{ profile.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="navbar-pill">
+            <div class="navbar-dot"></div>
+            <a href="{% url 'main:show_main' %}" class="brand">{{ profile.name }}</a>
+            <nav>
+                <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_education' %}">Education</a>
+                <a href="{% url 'main:show_experience' %}">Experience</a>
+                <a href="{% url 'main:show_awards' %}">Awards</a>
+                <a href="{% url 'main:show_projects' %}">Projects</a>
+                <a href="{% url 'main:show_skills' %}">Skills</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="awards-section awards-page" id="awards">
+            <div class="container">
+                <div class="page-grid">
+                    <div class="page-heading">
+                        <h1>AWARDS</h1>
+                    </div>
+                    <div class="page-content">
+                        <div class="awards-list">
+                    {% for award in award_list %}
+                        <article class="awards-item">
+                            <div class="item-row">
+                                {% if award.thumbnail %}
+                                    <img class="item-icon" src="{{ award.thumbnail }}" alt="{{ award.title }} logo">
+                                {% endif %}
+                                <div class="item-text">
+                                    <h3>{{ award.title }}</h3>
+                                </div>
+                            </div>
+                            <p>{{ award.description }}</p>
+                        </article>
+                    {% empty %}
+                        <p class="empty-state">No awards have been added yet.</p>
+                    {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

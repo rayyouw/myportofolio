@@ -3,59 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experience - {{ name }}</title>
+    <title>Experience - {{ profile.name }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
 </head>
 
 <body>
     <header class="site-header">
         <div class="navbar-pill">
             <div class="navbar-dot"></div>
-            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
+            <a href="{% url 'main:show_main' %}" class="brand">{{ profile.name }}</a>
             <nav>
                 <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_education' %}">Education</a>
                 <a href="{% url 'main:show_experience' %}">Experience</a>
+                <a href="{% url 'main:show_awards' %}">Awards</a>
+                <a href="{% url 'main:show_projects' %}">Projects</a>
+                <a href="{% url 'main:show_skills' %}">Skills</a>
             </nav>
         </div>
     </header>
 
 <main>
-    <section class="experience-section" id="experience">
+    <section class="experience-section experience-page" id="experience">
         <div class="container">
-            <p class="section-kicker">My journey so far</p>
-            <h1>Experience</h1>
-
-            <div class="experience-grid">
+            <div class="page-grid">
+                <div class="page-heading">
+                    <h1>EXPERIENCES</h1>
+                </div>
+                <div class="page-content">
+                    <div class="experience-list timeline">
                 {% for experience in experience_list %}
-                    <article class="experience-card">
-                        {% if experience.thumbnail %}
-                            <img class="item-icon" src="{{ experience.thumbnail }}" alt="{{ experience.title }} logo">
-                        {% endif %}
-                        <span class="experience-category">
-                            {{ experience.get_category_display }}
-                        </span>
-                        <h2>{{ experience.title }}</h2>
-                        <h3>{{ experience.role }}</h3>
+                    <article class="experience-item timeline-item">
+                        <div class="item-row">
+                            {% if experience.thumbnail %}
+                                <img class="item-icon" src="{{ experience.thumbnail }}" alt="{{ experience.title }} logo">
+                            {% endif %}
+                            <div class="item-text">
+                                <div class="experience-heading">
+                                    <h3>{{ experience.title }}</h3>
+                                    <p>
+                                        {{ experience.started_at|date:"M Y" }} -
+                                        {% if experience.is_ongoing %}
+                                            Present
+                                        {% else %}
+                                            {{ experience.ended_at|date:"M Y" }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <h4>{{ experience.role }}</h4>
+                            </div>
+                        </div>
                         <ul>
                             {% for highlight in experience.highlights %}
                                 <li>{{ highlight }}</li>
                             {% endfor %}
                         </ul>
-
-                        {% if experience.is_ongoing %}
-                            <p class="experience-status">Ongoing</p>
-                        {% else %}
-                            <p class="experience-status">Completed</p>
-                        {% endif %}
                     </article>
                 {% empty %}
-                    <p class="empty-state">
-                        No experience has been added yet.
-                    </p>
+                    <p class="empty-state">No experience has been added yet.</p>
                 {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
     </section>
