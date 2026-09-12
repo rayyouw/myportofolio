@@ -1,25 +1,57 @@
 from django.shortcuts import render
 
-from main.models import Experience
+from main.models import (
+    Award,
+    Education,
+    Experience,
+    Profile,
+    Project,
+    SkillCategory,
+)
 
 
 def show_main(request):
     context = {
-        "name": "Rayhan Fairuz Aqram",
-        "npm": "2506586186",
-        "study_program": "S1 Ilmu Komputer",
-        "bio": (
-            "A Computer Science student at Universitas Indonesia interested "
-            "in data science and artificial intelligence."
-        ),
-        "experience_list": Experience.objects.all(),
+            "profile": Profile.objects.first(),
     }
-    return render(request, "index.html", context)
+    return render(request, "profile.html", context)
 
 
 def show_experience(request):
     context = {
-        "name": "Rayhan Fairuz Aqram",
+        "profile": Profile.objects.first(),
         "experience_list": Experience.objects.all(),
     }
     return render(request, "experience.html", context)
+
+
+def show_awards(request):
+    context = {
+        "profile": Profile.objects.first(),
+        "award_list": Award.objects.all(),
+    }
+    return render(request, "awards.html", context)
+
+
+def show_education(request):
+    context = {
+        "profile": Profile.objects.first(),
+        "education_list": Education.objects.all(),
+    }
+    return render(request, "education.html", context)
+
+
+def show_skills(request):
+    context = {
+        "profile": Profile.objects.first(),
+        "skill_categories": SkillCategory.objects.prefetch_related("skills"),
+    }
+    return render(request, "skills.html", context)
+
+
+def show_projects(request):
+    context = {
+        "profile": Profile.objects.first(),
+        "project_list": Project.objects.all(),
+    }
+    return render(request, "projects.html", context)
