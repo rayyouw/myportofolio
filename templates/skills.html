@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills - {{ profile.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
+</head>
+<body>
+    <header class="site-header">
+        <div class="navbar-pill">
+            <div class="navbar-dot"></div>
+            <a href="{% url 'main:show_main' %}" class="brand">{{ profile.name }}</a>
+            <nav>
+                <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_education' %}">Education</a>
+                <a href="{% url 'main:show_experience' %}">Experience</a>
+                <a href="{% url 'main:show_awards' %}">Awards</a>
+                <a href="{% url 'main:show_projects' %}">Projects</a>
+                <a href="{% url 'main:show_skills' %}">Skills</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="skills-section standalone-page" id="skills">
+            <div class="container">
+                <div class="page-grid">
+                    <div class="page-heading">
+                        <h1>SKILLS</h1>
+                    </div>
+                    <div class="page-content">
+                        <div class="skills-list">
+                            {% for category in skill_categories %}
+                                <div class="skill-category">
+                                    <h3><span class="skill-number">{{ forloop.counter|stringformat:"02d" }}.</span> {{ category.title }}</h3>
+                                    <div class="item-skills-list">
+                                        {% for skill in category.skills.all %}
+                                            <div class="item-skills">
+                                                {% if skill.thumbnail %}<img class="item-icon" src="{{ skill.thumbnail }}" alt="{{ skill.name }}">{% endif %}
+                                                <span>{{ skill.name }}</span>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <p class="empty-state">No skills have been added yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
