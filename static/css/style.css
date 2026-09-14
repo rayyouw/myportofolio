@@ -711,6 +711,217 @@ section[id] {
     height: 14px;
 }
 
+.project-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.project-kicker {
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.button {
+    display: inline-block;
+    border: 0;
+    border-radius: var(--radius);
+    padding: 0.65rem 1rem;
+    background: #4fe0ff;
+    color: #050b18;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.button-secondary {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.button-danger {
+    background: #e76f51;
+    color: #fff;
+}
+
+.project-search {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.project-search__input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.7rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    color: #050b18;
+    font: inherit;
+}
+
+.project-search__input:focus,
+.project-form input:focus,
+.project-form textarea:focus {
+    outline: 2px solid #4fe0ff;
+    border-color: #4fe0ff;
+}
+
+.project-description {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.project-actions,
+.project-form-actions,
+.project-delete-modal__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.project-actions {
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.project-actions .button-danger {
+    font-size: 0.85rem;
+}
+
+.form-success {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #4fe0ff;
+    border-radius: var(--radius);
+    color: #4fe0ff;
+}
+
+.project-form-page {
+    min-height: 100vh;
+    padding: var(--header-space) 0 3rem;
+}
+
+.project-form {
+    width: 100%;
+    max-width: 720px;
+    margin-top: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font: inherit;
+}
+
+.form-error {
+    margin-top: 0.35rem;
+    color: #ff8f85;
+    font-size: 0.85rem;
+}
+
+.project-delete-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 1rem;
+    border: 0;
+    background: transparent;
+    z-index: 110;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-delete-modal:popover-open {
+    display: flex;
+}
+
+.project-delete-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: rgba(5, 11, 24, 0.75);
+}
+
+.project-delete-modal__content {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 480px);
+    padding: 1.5rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.35);
+}
+
+.project-delete-modal__content h2 {
+    margin-bottom: 0.75rem;
+}
+
+.project-delete-modal__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    border: 0;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.8rem;
+    cursor: pointer;
+}
+
+.project-delete-modal__actions {
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 600px) {
+    .project-header,
+    .project-search {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .project-add-button,
+    .project-search .button {
+        text-align: center;
+    }
+
+    .project-delete-modal {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .project-delete-modal__content {
+        width: 100%;
+        border-radius: var(--radius) var(--radius) 0 0;
+    }
+}
+
 /* Judul entri awards dengan pemotongan kata otomatis jika terlalu panjang */
 .awards-item h3 {
     font-size: 1.15rem;

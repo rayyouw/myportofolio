@@ -28,34 +28,50 @@
     <main>
         <section class="projects-section standalone-page" id="projects">
             <div class="container">
+                {% if messages %}
+                    {% for message in messages %}<p class="form-success">{{ message }}</p>{% endfor %}
+                {% endif %}
                 <div class="page-grid">
                     <div class="page-heading">
                         <h1>PROJECTS</h1>
                     </div>
                     <div class="page-content">
+                        <div class="project-header">
+                            <p class="project-kicker">Karya yang saya bangun</p>
+                            <a href="{% url 'main:create_project' %}" class="button project-add-button">+ Tambah Proyek</a>
+                        </div>
+                        <form method="get" action="{% url 'main:show_projects' %}" class="project-search">
+                            <input type="search" name="title" value="{{ title_query }}" placeholder="Cari berdasarkan nama proyek" class="project-search__input" aria-label="Cari berdasarkan nama proyek">
+                            <button type="submit" class="button">Cari</button>
+                        </form>
                         <div class="projects-list">
                             {% for project in project_list %}
                                 <article class="project-item">
-                                    {% if project.image %}<img class="image-project" src="{{ project.image }}" alt="{{ project.title }}">{% endif %}
+                                    {% if project.project_image_url or project.image %}<img class="image-project" src="{{ project.project_image_url|default:project.image }}" alt="{{ project.title }}">{% endif %}
                                     <div class="project-tags">
                                         {% for tag in project.tags %}<span class="project-tag">{{ tag }}</span>{% endfor %}
+                                        {% if project.tech_stack %}<span class="project-tag">{{ project.tech_stack }}</span>{% endif %}
                                         {% if project.year %}<span class="project-year">{{ project.year }}</span>{% endif %}
                                     </div>
                                     <h3>{{ project.title }}</h3>
+                                    {% if project.description %}<p class="project-description">{{ project.description }}</p>{% endif %}
                                     <ul>
                                         {% for highlight in project.highlights %}<li>{{ highlight }}</li>{% endfor %}
                                     </ul>
-                                    {% if project.link %}
-                                        <a href="{{ project.link }}" class="project-link" target="_blank" rel="noopener">
+                                    <div class="project-actions">
+                                    {% if project.project_url or project.link %}
+                                        <a href="{{ project.project_url|default:project.link }}" class="project-link" target="_blank" rel="noopener">
                                             View Project
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <path d="M7 17L17 7M17 7H7M17 7V17"/>
                                             </svg>
                                         </a>
                                     {% endif %}
+                                        {% include "components/project_delete_modal.html" with project=project %}
+                                    </div>
                                 </article>
                             {% empty %}
-                                <p class="empty-state">No projects have been added yet.</p>
+                                <p class="empty-state">{% if title_query %}Tidak ada proyek dengan nama tersebut.{% else %}No projects have been added yet.{% endif %}</p>
                             {% endfor %}
                         </div>
                     </div>

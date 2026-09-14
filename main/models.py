@@ -108,6 +108,10 @@ class Skill(models.Model):
 
 class Project(models.Model):
     title = models.CharField(max_length=255)
+    description = models.TextField(default="")
+    tech_stack = models.CharField(max_length=255, default="")
+    project_url = models.URLField(blank=True, default="")
+    project_image_url = models.URLField(blank=True, max_length=500, default="")
     image = models.URLField(blank=True)
     tags = models.JSONField(default=list, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True)

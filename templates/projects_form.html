@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Project - {{ profile.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=2">
+</head>
+<body>
+    <header class="site-header">
+        <div class="navbar-pill">
+            <div class="navbar-dot"></div>
+            <a href="{% url 'main:show_main' %}" class="brand">{{ profile.name }}</a>
+            <nav>
+                <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_projects' %}">Projects</a>
+            </nav>
+        </div>
+    </header>
+    <main class="project-form-page">
+        <div class="container">
+            <h1>Tambah Proyek</h1>
+            <form method="post" action="{% url 'main:create_project' %}" class="project-form">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+                    </div>
+                {% endfor %}
+                <div class="project-form-actions">
+                    <button type="submit" class="button">Tambah Project</button>
+                    <a href="{% url 'main:show_projects' %}" class="button button-secondary">Batal</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
