@@ -6,6 +6,8 @@ from main.models import Award, Experience, Project
 
 
 class MainTest(TestCase):
+    access_code = "rayhanfairuz"
+
     def setUp(self):
         self.experience = Experience.objects.create(
             title="Teaching Assistant - Fasilkom UI",
@@ -66,6 +68,46 @@ class MainTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "projects.html")
         self.assertContains(response, "No projects have been added yet.")
+
+    def test_project_creation_requires_access_code(self):
+        project_data = {
+            "title": "Protected Project",
+            "description": "A protected project",
+            "tech_stack": "Django",
+            "project_url": "https://example.com/protected",
+            "project_image_url": "",
+        }
+        response = self.client.post(
+            reverse("main:create_project"),
+            {**project_data, "access_code": "wrong"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Project.objects.filter(title="Protected Project").exists())
+
+        response = self.client.post(
+            reverse("main:create_project"),
+            {**project_data, "access_code": self.access_code},
+        )
+        self.assertRedirects(response, reverse("main:show_projects"))
+        self.assertTrue(Project.objects.filter(title="Protected Project").exists())
+
+    def test_award_and_project_deletion_require_access_code(self):
+        for url_name, object_id, model in (
+            ("delete_awards", self.award.id, Award),
+            ("delete_project", self.project.id, Project),
+        ):
+            response = self.client.post(
+                reverse("main:" + url_name, args=[object_id]),
+                {"access_code": "wrong"},
+            )
+            self.assertRedirects(response, reverse("main:show_awards" if model is Award else "main:show_projects"))
+            self.assertTrue(model.objects.filter(id=object_id).exists())
+
+            self.client.post(
+                reverse("main:" + url_name, args=[object_id]),
+                {"access_code": self.access_code},
+            )
+            self.assertFalse(model.objects.filter(id=object_id).exists())
 
     def test_profile_dynamic_bio_highlights(self):
         response = self.client.get(reverse("main:show_main"))

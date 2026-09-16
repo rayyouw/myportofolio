@@ -4,22 +4,12 @@ from django.db import models
 
 
 class Experience(models.Model):
-    EXPERIENCE_CHOICES = [
-        ("internship", "Internship"),
-        ("research", "Research"),
-        ("volunteer", "Volunteer"),
-        ("part-time", "Part-Time"),
-        ("full-time", "Full-Time"),
-        ("freelance", "Freelance"),
-    ]
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     role = models.CharField(max_length=255, blank=True)
     highlights = models.JSONField(default=list, blank=True)
     category = models.CharField(
         max_length=20,
-        choices=EXPERIENCE_CHOICES,
         default="full-time",
     )
     thumbnail = models.URLField(blank=True, null=True)

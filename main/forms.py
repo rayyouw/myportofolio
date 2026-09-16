@@ -1,6 +1,8 @@
+from django import forms
 from django.forms import ModelForm, TextInput, Textarea, URLInput
 
 from main.models import Project
+from main.models import Award
 
 
 class ProjectForm(ModelForm):
@@ -51,3 +53,47 @@ class ProjectForm(ModelForm):
                 }
             ),
         }
+
+class AwardsForm(ModelForm):
+    class Meta:
+        model = Award
+        fields = [
+            "title",
+            "description",
+            "thumbnail",
+        ]
+
+        labels = {
+            "title": "Nama Lomba",
+            "description": "Deskripsi Lomba",
+            "thumbnail": "URL Gambar Lomba",
+        }
+
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "Data Mining - Gemastik 2026",
+                    "maxlength": 255,
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "placeholder": "Tell us about your award",
+                    "rows": 3,
+                }
+            ),
+            "thumbnail": URLInput(
+                attrs={
+                    "placeholder": "https://drive.google.com/thumbnail?id=...&sz=w1000",
+                }
+            ),
+        }
+
+
+class AccessCodeForm(forms.Form):
+    access_code = forms.CharField(
+        label="Kode akses",
+        widget=forms.PasswordInput(
+            attrs={"placeholder": "Masukkan kode akses", "autocomplete": "off"}
+        ),
+    )

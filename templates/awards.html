@@ -1,31 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
+
+{% block meta %}
     <title>Awards - {{ profile.name }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=2">
-</head>
-
-<body>
-    <header class="site-header">
-        <div class="navbar-pill">
-            <div class="navbar-dot"></div>
-            <a href="{% url 'main:show_main' %}" class="brand">{{ profile.name }}</a>
-            <nav>
-                <a href="{% url 'main:show_main' %}">Profile</a>
-                <a href="{% url 'main:show_education' %}">Education</a>
-                <a href="{% url 'main:show_experience' %}">Experience</a>
-                <a href="{% url 'main:show_awards' %}">Awards</a>
-                <a href="{% url 'main:show_projects' %}">Projects</a>
-                <a href="{% url 'main:show_skills' %}">Skills</a>
-            </nav>
-        </div>
-    </header>
-
+{% endblock meta %}
+{% block content %}
     <main>
         <section class="awards-section awards-page" id="awards">
             <div class="container">
@@ -34,6 +12,13 @@
                         <h1>AWARDS</h1>
                     </div>
                     <div class="page-content">
+                        {% if messages %}
+                            {% for message in messages %}<p class="{% if message.tags == 'error' %}form-error{% else %}form-success{% endif %}">{{ message }}</p>{% endfor %}
+                        {% endif %}
+                        <div class="project-header">
+                            <p class="project-kicker">Pencapaian yang saya raih</p>
+                            <a href="{% url 'main:create_awards' %}" class="button project-add-button">+ Tambah Award</a>
+                        </div>
                         <div class="awards-list">
                     {% for award in award_list %}
                         <article class="awards-item">
@@ -46,6 +31,10 @@
                                 </div>
                             </div>
                             <p>{{ award.description }}</p>
+                            <div class="project-actions">
+                                <a href="{% url 'main:update_awards' award.id %}" class="button button-secondary">Edit Award</a>
+                            {% include "components/award_delete_modal.html" with award=award %}
+                            </div>
                         </article>
                     {% empty %}
                         <p class="empty-state">No awards have been added yet.</p>
@@ -56,5 +45,4 @@
             </div>
         </section>
     </main>
-</body>
-</html>
+{% endblock content %}

@@ -1,31 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
+
+{% block meta %}
     <title>Experience - {{ profile.name }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css?v=2">
-</head>
-
-<body>
-    <header class="site-header">
-        <div class="navbar-pill">
-            <div class="navbar-dot"></div>
-            <a href="{% url 'main:show_main' %}" class="brand">{{ profile.name }}</a>
-            <nav>
-                <a href="{% url 'main:show_main' %}">Profile</a>
-                <a href="{% url 'main:show_education' %}">Education</a>
-                <a href="{% url 'main:show_experience' %}">Experience</a>
-                <a href="{% url 'main:show_awards' %}">Awards</a>
-                <a href="{% url 'main:show_projects' %}">Projects</a>
-                <a href="{% url 'main:show_skills' %}">Skills</a>
-            </nav>
-        </div>
-    </header>
-
+{% endblock meta %}
+{% block content %}
 <main>
     <section class="experience-section experience-page" id="experience">
         <div class="container">
@@ -34,8 +12,17 @@
                     <h1>EXPERIENCES</h1>
                 </div>
                 <div class="page-content">
-                    <div class="experience-list timeline">
-                {% for experience in experience_list %}
+                    <div class="experience-tabs" role="tablist" aria-label="Experience categories">
+                        <button class="experience-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="professional-experiences" data-experience-tab="professional-experiences">
+                            Professional
+                        </button>
+                        <button class="experience-tab" type="button" role="tab" aria-selected="false" aria-controls="organization-experiences" data-experience-tab="organization-experiences">
+                            Organization / Volunteer
+                        </button>
+                    </div>
+
+                    <div class="experience-list timeline experience-panel is-active" id="professional-experiences" role="tabpanel">
+                {% for experience in professional_experiences %}
                     <article class="experience-item timeline-item">
                         <div class="item-row">
                             {% if experience.thumbnail %}
@@ -63,7 +50,40 @@
                         </ul>
                     </article>
                 {% empty %}
-                    <p class="empty-state">No experience has been added yet.</p>
+                    <p class="empty-state">No professional experience has been added yet.</p>
+                {% endfor %}
+                    </div>
+
+                    <div class="experience-list timeline experience-panel" id="organization-experiences" role="tabpanel" hidden>
+                {% for experience in organization_experiences %}
+                    <article class="experience-item timeline-item">
+                        <div class="item-row">
+                            {% if experience.thumbnail %}
+                                <img class="item-icon" src="{{ experience.thumbnail }}" alt="{{ experience.title }} logo">
+                            {% endif %}
+                            <div class="item-text">
+                                <div class="experience-heading">
+                                    <h3>{{ experience.title }}</h3>
+                                    <p>
+                                        {{ experience.started_at|date:"M Y" }} -
+                                        {% if experience.is_ongoing %}
+                                            Present
+                                        {% else %}
+                                            {{ experience.ended_at|date:"M Y" }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <h4>{{ experience.role }}</h4>
+                            </div>
+                        </div>
+                        <ul>
+                            {% for highlight in experience.highlights %}
+                                <li>{{ highlight }}</li>
+                            {% endfor %}
+                        </ul>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">No organization or volunteer experience has been added yet.</p>
                 {% endfor %}
                     </div>
                 </div>
@@ -71,5 +91,25 @@
         </div>
     </section>
 </main>
-</body>
-</html>
+<script>
+    const experienceTabs = document.querySelectorAll('[data-experience-tab]');
+    const experiencePanels = document.querySelectorAll('.experience-panel');
+
+    experienceTabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+            const targetId = tab.dataset.experienceTab;
+
+            experienceTabs.forEach((currentTab) => {
+                const isSelected = currentTab === tab;
+                currentTab.classList.toggle('is-active', isSelected);
+                currentTab.setAttribute('aria-selected', String(isSelected));
+            });
+
+            experiencePanels.forEach((panel) => {
+                panel.hidden = panel.id !== targetId;
+                panel.classList.toggle('is-active', panel.id === targetId);
+            });
+        });
+    });
+</script>
+{% endblock content %}
