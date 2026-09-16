@@ -36,7 +36,7 @@ EXPERIENCES = [
         "category": "volunteer",
         "thumbnail": "/static/img/logo-compfest.png",
         "highlights": [
-            "Served as Person in Charge for the Seminar and Workshop at Xcelerate Batch 2, leading concept creation and speaker and partner outreach.",
+            "Served as Person in Charge for the Seminar and Workshop at Xcelerate Batch 2, leading concept creation and partner outreach from Osnova Company.",
             "Coordinated Marketing, Operational, and IT Development teams to ensure seamless event execution.",
         ],
         "started_at": datetime(2026, 4, 1),
