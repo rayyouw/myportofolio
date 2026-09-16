@@ -20,8 +20,10 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# gunakan https:// untuk trailing urlnya
-CSRF_TRUSTED_ORIGINS = ["https://https://rayhan-fairuz51-myportofolio.pws.cs.ui.ac.id/"]
+# Allow secure POST requests from the deployed PWS domain.
+CSRF_TRUSTED_ORIGINS = [
+    "https://rayhan-fairuz51-myportofolio.pws.cs.ui.ac.id",
+]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
