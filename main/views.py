@@ -31,7 +31,7 @@ def show_main(request):
 
 
 def show_experience(request):
-    experiences = Experience.objects.all()
+    experiences = Experience.objects.order_by("-started_at")
     context = {
         "profile": Profile.objects.first(),
         "professional_experiences": experiences.filter(
