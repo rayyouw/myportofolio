@@ -12,10 +12,36 @@
                         <h1>SKILLS</h1>
                     </div>
                     <div class="page-content">
-                        <div class="skills-list">
+                        <div class="experience-tabs skills-tabs" role="tablist" aria-label="Skill categories">
                             {% for category in skill_categories %}
+                                <input
+                                    class="skill-tab-input"
+                                    type="radio"
+                                    name="skill-category"
+                                    id="skill-tab-{{ forloop.counter }}"
+                                    {% if forloop.first %}checked{% endif %}
+                                >
+                                <label class="experience-tab" for="skill-tab-{{ forloop.counter }}">
+                                    {% if forloop.counter == 1 %}
+                                        Programming Language
+                                    {% elif forloop.counter == 2 %}
+                                        Data Science &amp; Machine Learning
+                                    {% elif forloop.counter == 3 %}
+                                        Tools
+                                    {% else %}
+                                        Language
+                                    {% endif %}
+                                </label>
+                            {% endfor %}
+                        </div>
+
+                        {% for category in skill_categories %}
+                            <div
+                                class="skills-list skills-panel{% if forloop.first %} is-active{% endif %}"
+                                id="skill-category-{{ forloop.counter }}"
+                                role="tabpanel"
+                            >
                                 <div class="skill-category">
-                                    <h3><span class="skill-number">{{ forloop.counter|stringformat:"02d" }}.</span> {{ category.title }}</h3>
                                     <div class="item-skills-list">
                                         {% for skill in category.skills.all %}
                                             <div class="item-skills">
@@ -25,10 +51,10 @@
                                         {% endfor %}
                                     </div>
                                 </div>
-                            {% empty %}
-                                <p class="empty-state">No skills have been added yet.</p>
-                            {% endfor %}
-                        </div>
+                            </div>
+                        {% empty %}
+                            <p class="empty-state">No skills have been added yet.</p>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
