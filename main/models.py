@@ -28,6 +28,7 @@ class Award(models.Model):
     title = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
     thumbnail = models.URLField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title

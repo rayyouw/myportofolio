@@ -38,6 +38,7 @@
                                         {% for highlight in project.highlights %}<li>{{ highlight }}</li>{% endfor %}
                                     </ul>
                                     <div class="project-actions">
+                                        <a href="{% url 'main:update_project' project.id %}" class="button button-secondary">Edit Project</a>
                                     {% if project.project_url or project.link %}
                                         <a href="{{ project.project_url|default:project.link }}" class="project-link" target="_blank" rel="noopener">
                                             View Project

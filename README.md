@@ -31,6 +31,19 @@ Jawab: Sesuai prinsip MVT, data disimpan di model supaya bisa diubah lewat Djang
  
 Jawab: `makemigrations` membuat file migrasi berdasarkan perubahan pada model, tanpa mengubah database. `migrate` mengeksekusi file migrasi tersebut ke database sehingga skemanya benar-benar berubah. Contoh nyata di project saya: saat model `Award` ditambahkan ke `models.py`, `python manage.py makemigrations` menghasilkan file `main/migrations/0004_award.py` yang mendeskripsikan tabel baru tersebut, namun database belum berubah sampai `python manage.py migrate` dijalankan untuk benar-benar membuat tabel `Award` di database.
 
+## Tugas 3
+**1. Jelaskan mengapa kita menggunakan ModelForm pada Django alih-alih membuat form HTML secara manual. Selain itu, jelaskan pula mengapa kita diwajibkan menambahkan `{% csrf_token %}` pada form tersebut!**
+
+Jawab: Framework Django menyajikan alur kode yang lebih sistematis dan terstruktur, terutama mengenai pengelolaan database setiap kita ingin menambahkan atau mengurangi data tertentu. Jika menggunakan form HTML secara manual, saya harus menulis baris kode HTML satu per satu dan mengedit database secara manual. Kemudian, fungsi `{% csrf_token %}` sendiri bertugas untuk melindungi situs dari serangan CSRF (Cross-Site Request Forgery), yakni serangan yang dilakukan pihak ketiga yang ingin melakukan fraud ke situs tanpa sepengetahuan pengguna yang sedang login.
+
+**2. Pada Tutorial 03, kita membahas format data `JSON` dan `XML`. Mengapa `JSON` lebih disukai dalam pengembangan aplikasi web modern dibandingkan `XML`?**
+
+Jawab: `JSON` memiliki syntax yang lebih mudah dipahami dan ukuran berkas yang lebih ringan dibandingkan `XML`. Selain itu, format `JSON` juga lebih cepat diproses karena strukturnya terintegrasi secara native dengan `JavaScript`.
+
+**3. Jelaskan alur yang terjadi saat kamu menggunakan fungsi view untuk mengembalikan data portofoliomu dalam bentuk `JSON`. Mengapa kita perlu melakukan proses serialization pada model `Django` sebelum datanya dikembalikan?**
+
+Jawab: Saat URL diakses, fungsi view Django akan dipicu untuk mengambil data portofolio dari database menggunakan Object-Relational Mapping (ORM). Data tersebut kemudian harus melalui `serialization` untuk diubah dari objek Python (QuerySet) yang kompleks menjadi format data universal seperti dictionary atau teks string. `Serialization` dilakukan karena pada dasarnya situs tidak memahami objek internal `Django` sehingga data perlu diterjemahkan ke format yang netral. Terakhir, view membungkus data hasil serialisasi tersebut ke dalam `JsonResponse` untuk dikirimkan kembali ke klien melalui protokol HTTP.
+
 ## AI Disclosure
 ### Tugas 1
 Saya menggunakan **Claude (Anthropic)** sebagai bantuan selama mengerjakan tugas ini, dengan rincian sebagai berikut:
@@ -41,8 +54,7 @@ Saya menggunakan **Claude (Anthropic)** sebagai bantuan selama mengerjakan tugas
 3. Review kode untuk mendeteksi CSS yang redundan/konflik (misalnya dua deklarasi `.hero` yang saling menimpa).
 4. Penyusunan pesan commit mengikuti format Conventional Commits.
 
-**Strategi prompting:** Saya memberikan potongan kode HTML/CSS asli saya secara langsung, lalu meminta AI menjelaskan penyebab bug secara spesifik dan optimasi yang bisa dilakukan.
- 
+**Strategi prompting:** Saya memberikan potongan kode HTML/CSS asli saya secara langsung, lalu meminta AI menjelaskan penyebab bug secara spesifik dan optimasi yang bisa dilakukan. 
 **Keterbatasan AI yang saya temukan:** Beberapa saran AI kurang match dengan ekspektasi yang saya mau, seperti misalkan membuat foto dan teks sejajar atau mengubah theme color sesuai selera saya. Jadi, saya mengambil kesimpulan bahwa AI belum bisa untuk mengerti secara kompleks kreativitas dari manusia.
 
 ### Tugas 2
@@ -56,5 +68,17 @@ Saya menggunakan **GitHub Copilot** sebagai bantuan selama mengerjakan tugas ini
 **Strategi prompting:** Saya bertanya secara spesifik terkait konsep yang belum saya pahami (misalnya alur MVT) sebelum menerapkannya ke kode, serta menempelkan pesan error PostgreSQL secara langsung untuk didiagnosis penyebabnya.
  
 **Keterbatasan AI yang saya temukan:** Untuk debugging error database, AI kadang perlu informasi tambahan (seperti isi file `.env` atau versi PostgreSQL) untuk memberi solusi yang tepat sehingga perlu debugging manual.
+
+### Tugas 3
+Saya menggunakan **Github Copilot** sebagai bantuan selama mengerjakan tugas ini, dengan rincian sebagai berikut:
+ 
+**Bagian yang dibantu AI:**
+1. Membantu dalam mengembangkan fitur category pada section experience dan skills supaya lebih interaktif.
+2. Membantu debugging, terutama ketika berurusan dengan beberapa file Django, seperti `urls.py` dan `models.py`.
+4. Penyusunan pesan commit mengikuti format Conventional Commits.
+
+**Strategi prompting:** Saya memberikan potongan kode HTML/CSS dengan framework Django saya secara langsung, lalu menanyakan AI tentang penyebab bug secara spesifik dan optimasi yang bisa dilakukan.
+ 
+**Keterbatasan AI yang saya temukan:** AI beberapa kali men-generate code yang tidak sesuai sehingga menyebabkan website yang dihasilkan kurang enak untuk dilihat. Selain itu, AI juga beberapa kali kurang paham mengenai konteks project secara keseluruhan sehingga perlu intervensi dari saya.
 
 

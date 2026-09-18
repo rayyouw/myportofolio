@@ -179,6 +179,30 @@ def create_project(request):
     return render(request, "projects_form.html", context)
 
 
+def update_project(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    form = ProjectForm(request.POST or None, instance=project)
+    access_form = AccessCodeForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        if access_form.is_valid() and access_form.cleaned_data["access_code"] == ACCESS_CODE:
+            form.save()
+            messages.success(request, "Project berhasil diperbarui!")
+            return redirect("main:show_projects")
+        access_form.add_error("access_code", "Kode akses salah.")
+
+    context = {
+        "profile": Profile.objects.first(),
+        "form": form,
+        "access_form": access_form,
+        "form_title": "Edit Project",
+        "form_action": "main:update_project",
+        "submit_label": "Simpan Perubahan",
+        "project": project,
+    }
+    return render(request, "projects_form.html", context)
+
+
 def get_projects_json(request):
     title_query = request.GET.get("title", "").strip()
     projects = Project.objects.all()
