@@ -4,7 +4,7 @@ from django.db import migrations
 PROFILE = {
     "name": "Rayhan Fairuz Aqram",
     "npm": "2506586186",
-    "study_program": "S1 Ilmu Komputer",
+    "study_program": "Computer Science",
     "bio_intro": "student at Universitas Indonesia.",
     "events_count": 4,
     "organizations_count": 3,

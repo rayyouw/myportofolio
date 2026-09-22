@@ -167,3 +167,31 @@ class MainTest(TestCase):
 
         self.assertFalse(self.experience.is_ongoing)
         self.assertContains(response, self.experience.ended_at.strftime("%b %Y"))
+
+    def test_auth_views_are_accessible(self):
+        response_register = self.client.get(reverse("main:register"))
+        response_login = self.client.get(reverse("main:login"))
+
+        self.assertEqual(response_register.status_code, 200)
+        self.assertEqual(response_login.status_code, 200)
+        self.assertTemplateUsed(response_register, "register.html")
+        self.assertTemplateUsed(response_login, "login.html")
+
+    def test_user_can_register_login_and_logout(self):
+        register_response = self.client.post(
+            reverse("main:register"),
+            {"username": "newuser", "password1": "StrongPass123!", "password2": "StrongPass123!"},
+        )
+        self.assertRedirects(register_response, reverse("main:login"))
+
+        login_response = self.client.post(
+            reverse("main:login"),
+            {"username": "newuser", "password": "StrongPass123!"},
+        )
+        self.assertRedirects(login_response, reverse("main:show_main"))
+        self.assertIn("sessionid", self.client.cookies)
+        self.assertIn("last_login", self.client.cookies)
+
+        logout_response = self.client.get(reverse("main:logout"))
+        self.assertRedirects(logout_response, reverse("main:show_main"))
+        self.assertNotIn("sessionid", self.client.cookies)

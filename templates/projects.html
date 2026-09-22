@@ -17,7 +17,9 @@
                     <div class="page-content">
                         <div class="project-header">
                             <p class="project-kicker">Karya yang saya bangun</p>
-                            <a href="{% url 'main:create_project' %}" class="button project-add-button">+ Tambah Proyek</a>
+                            {% if user.is_superuser %}
+                                <a href="{% url 'main:create_project' %}" class="button project-add-button">+ Tambah Proyek</a>
+                            {% endif %}
                         </div>
                         <form method="get" action="{% url 'main:show_projects' %}" class="project-search">
                             <input type="search" name="title" value="{{ title_query }}" placeholder="Cari berdasarkan nama proyek" class="project-search__input" aria-label="Cari berdasarkan nama proyek">
@@ -38,7 +40,10 @@
                                         {% for highlight in project.highlights %}<li>{{ highlight }}</li>{% endfor %}
                                     </ul>
                                     <div class="project-actions">
-                                        <a href="{% url 'main:update_project' project.id %}" class="button button-secondary">Edit Project</a>
+                                        {% include "components/project_star.html" with project=project %}
+                                        {% if user.is_superuser %}
+                                            <a href="{% url 'main:update_project' project.id %}" class="button button-secondary">Edit Project</a>
+                                        {% endif %}
                                     {% if project.project_url or project.link %}
                                         <a href="{{ project.project_url|default:project.link }}" class="project-link" target="_blank" rel="noopener">
                                             View Project
@@ -47,7 +52,9 @@
                                             </svg>
                                         </a>
                                     {% endif %}
-                                        {% include "components/project_delete_modal.html" with project=project %}
+                                        {% if user.is_superuser %}
+                                            {% include "components/project_delete_modal.html" with project=project %}
+                                        {% endif %}
                                     </div>
                                 </article>
                             {% empty %}

@@ -14,7 +14,7 @@
 <body>
     <header class="site-header">
       <div class="navbar-pill">
-          <a href="{% url 'main:show_main' %}" class="brand">{{ profile.name }}</a>
+          <a href="{% url 'main:show_main' %}" class="brand">{{ profile.username }}</a>
           <nav>
               <a href="{% url 'main:show_main' %}">Profile</a>
               <a href="{% url 'main:show_education' %}">Education</a>
@@ -22,6 +22,13 @@
               <a href="{% url 'main:show_awards' %}">Awards</a>
               <a href="{% url 'main:show_projects' %}">Projects</a>
               <a href="{% url 'main:show_skills' %}">Skills</a>
+              {% if user.is_authenticated %}
+                  <span class="nav-user">{{ user.username }}</span>
+                  <a href="{% url 'main:logout' %}">Logout</a>
+              {% else %}
+                  <a href="{% url 'main:login' %}">Login</a>
+                  <a href="{% url 'main:register' %}">Register</a>
+              {% endif %}
           </nav>
       </div>
     </header>

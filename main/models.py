@@ -1,5 +1,6 @@
 import uuid
 
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -35,6 +36,7 @@ class Award(models.Model):
 
 
 class Profile(models.Model):
+    username = models.CharField(max_length=50)
     name = models.CharField(max_length=255)
     npm = models.CharField(max_length=50)
     study_program = models.CharField(max_length=255)
@@ -109,6 +111,7 @@ class Project(models.Model):
     highlights = models.JSONField(default=list, blank=True)
     link = models.URLField(blank=True)
     order = models.PositiveIntegerField(default=0)
+    starred_by = models.ManyToManyField(User, related_name="starred_projects", blank=True)
 
     class Meta:
         ordering = ["order", "id"]
