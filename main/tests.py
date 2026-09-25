@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group, User
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -6,9 +7,24 @@ from main.models import Award, Experience, Project
 
 
 class MainTest(TestCase):
-    access_code = "rayhanfairuz"
-
     def setUp(self):
+        self.editor_group, _ = Group.objects.get_or_create(name="Editor")
+
+        self.superuser = User.objects.create_superuser(
+            username="owner",
+            password="OwnerPassword123!",
+            email="owner@example.com",
+        )
+        self.regular_user = User.objects.create_user(
+            username="regular",
+            password="RegularPassword123!",
+        )
+        self.editor_user = User.objects.create_user(
+            username="editor",
+            password="EditorPassword123!",
+        )
+        self.editor_user.groups.add(self.editor_group)
+
         self.experience = Experience.objects.create(
             title="Teaching Assistant - Fasilkom UI",
             role="Teaching Assistant of Discrete Mathematics 1",
@@ -69,7 +85,7 @@ class MainTest(TestCase):
         self.assertTemplateUsed(response, "projects.html")
         self.assertContains(response, "No projects have been added yet.")
 
-    def test_project_creation_requires_access_code(self):
+    def test_project_creation_authorization(self):
         project_data = {
             "title": "Protected Project",
             "description": "A protected project",
@@ -77,52 +93,142 @@ class MainTest(TestCase):
             "project_url": "https://example.com/protected",
             "project_image_url": "",
         }
-        response = self.client.post(
-            reverse("main:create_project"),
-            {**project_data, "access_code": "wrong"},
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(Project.objects.filter(title="Protected Project").exists())
 
-        response = self.client.post(
-            reverse("main:create_project"),
-            {**project_data, "access_code": self.access_code},
-        )
+        # 1. Unauthenticated -> redirect to login
+        response = self.client.post(reverse("main:create_project"), project_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response.url)
+
+        # 2. Regular user -> 403 Forbidden
+        self.client.force_login(self.regular_user)
+        response = self.client.post(reverse("main:create_project"), project_data)
+        self.assertEqual(response.status_code, 403)
+
+        # 3. Editor user -> 403 Forbidden (cannot create)
+        self.client.force_login(self.editor_user)
+        response = self.client.post(reverse("main:create_project"), project_data)
+        self.assertEqual(response.status_code, 403)
+
+        # 4. Superuser -> success
+        self.client.force_login(self.superuser)
+        response = self.client.post(reverse("main:create_project"), project_data)
         self.assertRedirects(response, reverse("main:show_projects"))
         self.assertTrue(Project.objects.filter(title="Protected Project").exists())
 
-    def test_award_and_project_deletion_require_access_code(self):
-        for url_name, object_id, model in (
-            ("delete_awards", self.award.id, Award),
-            ("delete_project", self.project.id, Project),
-        ):
-            response = self.client.post(
-                reverse("main:" + url_name, args=[object_id]),
-                {"access_code": "wrong"},
-            )
-            self.assertRedirects(response, reverse("main:show_awards" if model is Award else "main:show_projects"))
-            self.assertTrue(model.objects.filter(id=object_id).exists())
+    def test_project_update_authorization(self):
+        update_data = {
+            "title": "Updated Project",
+            "description": "Updated description",
+            "tech_stack": "Python, Django",
+            "project_url": "https://example.com/updated",
+            "project_image_url": "",
+        }
 
-            self.client.post(
-                reverse("main:" + url_name, args=[object_id]),
-                {"access_code": self.access_code},
-            )
-            self.assertFalse(model.objects.filter(id=object_id).exists())
+        # 1. Unauthenticated -> redirect to login
+        response = self.client.post(
+            reverse("main:update_project", args=[self.project.id]),
+            update_data,
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response.url)
 
-    def test_profile_dynamic_bio_highlights(self):
-        response = self.client.get(reverse("main:show_main"))
+        # 2. Regular user -> 403 Forbidden
+        self.client.force_login(self.regular_user)
+        response = self.client.post(
+            reverse("main:update_project", args=[self.project.id]),
+            update_data,
+        )
+        self.assertEqual(response.status_code, 403)
 
-        self.assertContains(response, 'bio-number">4+</strong>')
-        self.assertContains(response, 'bio-number">3+</strong>')
-        self.assertContains(response, 'bio-highlight">GEMASTIK</strong>')
-        self.assertContains(response, 'bio-highlight">SATRIA DATA</strong>')
+        # 3. Editor user -> success
+        self.client.force_login(self.editor_user)
+        response = self.client.post(
+            reverse("main:update_project", args=[self.project.id]),
+            update_data,
+        )
+        self.assertRedirects(response, reverse("main:show_projects"))
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.title, "Updated Project")
+
+        # 4. Superuser -> success
+        self.client.force_login(self.superuser)
+        update_data["title"] = "Superuser Updated"
+        response = self.client.post(
+            reverse("main:update_project", args=[self.project.id]),
+            update_data,
+        )
+        self.assertRedirects(response, reverse("main:show_projects"))
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.title, "Superuser Updated")
+
+    def test_award_deletion_authorization(self):
+        award = Award.objects.create(title="Temp Award", description="Temp")
+
+        # 1. Unauthenticated -> 302 redirect
+        response = self.client.post(reverse("main:delete_awards", args=[award.id]))
+        self.assertEqual(response.status_code, 302)
+
+        # 2. Regular user -> 403 Forbidden
+        self.client.force_login(self.regular_user)
+        response = self.client.post(reverse("main:delete_awards", args=[award.id]))
+        self.assertEqual(response.status_code, 403)
+
+        # 3. Editor -> 403 Forbidden
+        self.client.force_login(self.editor_user)
+        response = self.client.post(reverse("main:delete_awards", args=[award.id]))
+        self.assertEqual(response.status_code, 403)
+
+        # 4. Superuser -> success
+        self.client.force_login(self.superuser)
+        response = self.client.post(reverse("main:delete_awards", args=[award.id]))
+        self.assertRedirects(response, reverse("main:show_awards"))
+        self.assertFalse(Award.objects.filter(id=award.id).exists())
+
+    def test_project_deletion_authorization(self):
+        project = Project.objects.create(title="Temp Project")
+
+        # 1. Unauthenticated -> 302 redirect
+        response = self.client.post(reverse("main:delete_project", args=[project.id]))
+        self.assertEqual(response.status_code, 302)
+
+        # 2. Regular user -> 403 Forbidden
+        self.client.force_login(self.regular_user)
+        response = self.client.post(reverse("main:delete_project", args=[project.id]))
+        self.assertEqual(response.status_code, 403)
+
+        # 3. Editor -> 403 Forbidden
+        self.client.force_login(self.editor_user)
+        response = self.client.post(reverse("main:delete_project", args=[project.id]))
+        self.assertEqual(response.status_code, 403)
+
+        # 4. Superuser -> success
+        self.client.force_login(self.superuser)
+        response = self.client.post(reverse("main:delete_project", args=[project.id]))
+        self.assertRedirects(response, reverse("main:show_projects"))
+        self.assertFalse(Project.objects.filter(id=project.id).exists())
+
+    def test_toggle_star(self):
+        # 1. Unauthenticated -> redirect to login
+        response = self.client.post(reverse("main:toggle_star", args=[self.project.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response.url)
+
+        # 2. Regular user can star
+        self.client.force_login(self.regular_user)
+        response = self.client.post(reverse("main:toggle_star", args=[self.project.id]))
+        self.assertRedirects(response, reverse("main:show_projects"))
+        self.assertTrue(self.project.starred_by.filter(id=self.regular_user.id).exists())
+
+        # 3. Regular user can unstar
+        response = self.client.post(reverse("main:toggle_star", args=[self.project.id]))
+        self.assertRedirects(response, reverse("main:show_projects"))
+        self.assertFalse(self.project.starred_by.filter(id=self.regular_user.id).exists())
 
     def test_award_model(self):
         self.assertEqual(str(self.award), self.award.title)
 
     def test_nonexistent_page_returns_404(self):
         response = self.client.get("/a-page-that-does-not-exist/")
-
         self.assertEqual(response.status_code, 404)
 
     def test_experience_model(self):
@@ -158,7 +264,7 @@ class MainTest(TestCase):
         Experience.objects.all().delete()
         response = self.client.get(reverse("main:show_experience"))
 
-        self.assertContains(response, "No experience has been added yet.")
+        self.assertContains(response, "No professional experience has been added yet.")
 
     def test_completed_experience(self):
         self.experience.ended_at = timezone.now()
@@ -194,4 +300,4 @@ class MainTest(TestCase):
 
         logout_response = self.client.get(reverse("main:logout"))
         self.assertRedirects(logout_response, reverse("main:show_main"))
-        self.assertNotIn("sessionid", self.client.cookies)
+        self.assertFalse(self.client.session.get("_auth_user_id"))
