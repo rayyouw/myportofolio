@@ -1,9 +1,101 @@
-Nama : Rayhan Fairuz Aqram <br>
-NPM : 2506586186 <br>
-Kelas : PBP D <br>
-Hobi : Olahraga <br>
+# Portfolio Website - Rayhan Fairuz Aqram
 
-## Reflective Questions
+**Nama** : Rayhan Fairuz Aqram <br>
+**NPM** : 2506586186 <br>
+**Kelas** : PBP D <br>
+**Hobi** : Olahraga <br>
+**Tautan PWS** : [https://rayhan-fairuz51-myportofolio.pws.cs.ui.ac.id/](https://rayhan-fairuz51-myportofolio.pws.cs.ui.ac.id/) <br>
+**Tautan GitHub** : [https://github.com/rayyouw/myportofolio](https://github.com/rayyouw/myportofolio)
+
+---
+
+# 1. Documentation
+
+### Deskripsi Proyek
+Proyek ini adalah website portofolio pribadi berbasis Django yang dikembangkan secara bertahap pada mata kuliah Pemrograman Berbasis Platform (CSGE602022), Fakultas Ilmu Komputer, Universitas Indonesia. Website ini memuat informasi profil, latar belakang pendidikan, riwayat pengalaman profesional & organisasi, pencapaian kompetisi (*awards*), proyek teknologi, serta daftar keahlian (*skills*).
+
+---
+
+### Panduan Setup & Menjalankan Proyek Secara Lokal
+
+1. **Clone Repositori**:
+   ```bash
+   git clone https://github.com/rayyouw/myportofolio.git
+   cd myportofolio
+   ```
+
+2. **Buat dan Aktifkan Virtual Environment (Disarankan)**:
+   ```bash
+   python -m venv env
+   # Windows:
+   env\Scripts\activate
+   # Linux/macOS:
+   source env/bin/activate
+   ```
+
+3. **Install Dependensi**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Jalankan Migrasi Database**:
+   ```bash
+   python manage.py migrate
+   ```
+
+5. **Buat Akun Superuser (Pemilik Portofolio)**:
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+6. **Konfigurasi Role Editor**:
+   - Jalankan server: `python manage.py runserver`
+   - Buka Django Admin di `http://127.0.0.1:8000/admin/`.
+   - Buka menu **Groups** $\rightarrow$ Tambah group dengan nama persis: `Editor`.
+   - Buka menu **Users** $\rightarrow$ Pilih akun yang ingin dijadikan Editor, lalu centang group `Editor` pada bagian *Permissions/Groups*.
+
+7. **Jalankan Unit Test**:
+   ```bash
+   python manage.py test
+   ```
+
+8. **Akses Website**:
+   Buka browser di `http://127.0.0.1:8000/`.
+
+---
+
+### Perkembangan Mingguan (Weekly Progress)
+
+#### **Tugas 1: Static Web dengan HTML5 dan CSS3**
+- Membangun halaman *"About Me"* statis menggunakan elemen semantik HTML5 (`<header>`, `<nav>`, `<section>`, `<article>`, `<footer>`).
+- Mengimplementasikan layout responsif (desktop & mobile) menggunakan CSS Grid dan Flexbox.
+- Menyusun styling kustom di `style.css` untuk bagian profil, pendidikan, pengalaman, penghargaan, dan keahlian.
+
+#### **Tugas 2: Implementasi Model-View-Template (MVT)**
+- Menerapkan arsitektur MVT bawaan Django untuk memisahkan data, logika tampilan, dan presentasi.
+- Menambahkan model dinamis, membuat migrasi skema database, dan me-render data menggunakan Django Template Language (`{% for %}` dengan fallback `{% empty %}`).
+- Menyediakan routing terpisah di `main/urls.py` dan navigasi konsisten di navbar.
+- Menambahkan automated test untuk verifikasi routing, template, dan kelengkapan data.
+
+#### **Tugas 3: Form & Data Delivery (JSON)**
+- Menerapkan modularisasi template menggunakan inheritance (`base.html`).
+- Mengimplementasikan `ModelForm` dengan perlindungan `{% csrf_token %}` untuk operasi pembuatan (*create*), pembaruan (*update*), dan penghapusan (*delete*) data.
+- Menyediakan endpoint JSON publik (`/api/projects/`, `/api/awards/`, dll.) melalui serialisasi data Django ORM.
+
+#### **Tugas 4: Authentication, Session, Cookies, & Role-Based Access Control (RBAC)**
+- **Autentikasi & Sesi**: Mengimplementasikan registrasi, login, logout berbasis session Django, dan pelacakan aktivitas melalui cookie `last_login`.
+- **Role-Based Access Control (4 Tingkat Peran)**:
+  1. **Pengunjung (Belum Login)**: Hak akses hanya-baca (*read-only*). Tombol manipulasi data disembunyikan; aksi mutasi & klik bintang dialihkan ke `/login/`.
+  2. **Regular User**: Dapat membaca data dan memberi/mencabut bintang (**Star / Unstar**). Upaya manipulasi data ditolak di sisi server dengan HTTP `403 Forbidden` (`PermissionDenied`).
+  3. **Editor (Group `Editor`)**: Memiliki hak regular user ditambah hak mengedit/memperbarui data proyek dan *awards*. Tombol `Edit` ditampilkan secara kondisional via `{% if user.is_superuser or is_editor %}`. Tidak memiliki izin menambah baru atau menghapus data.
+  4. **Superuser (Pemilik)**: Memiliki hak akses penuh (*CRUD*) terhadap data portofolio dan bintang.
+- **Fitur Interaktif Star**: Relasi `ManyToManyField` `starred_by` pada model `Project` untuk mekanisme satu bintang per pengguna, dilengkapi endpoint `toggle_star` dengan verifikasi CSRF.
+- **Keamanan Data & Integritas API**: Endpoint `/api/projects/` menyajikan data proyek dan agregat `star_count` tanpa membocorkan identitas pengguna yang membintangi proyek.
+
+---
+
+# 2. Reflective Questions
+
 ### Tugas 1
  
 **1. Pada Tutorial dan Tugas 1, Anda diberi kebebasan untuk menentukan tampilan dari website portofolio Anda. Saat Anda merancang struktur HTML yang digunakan, apakah Anda menggunakan elemen semantik HTML5 seperti `<section>`, `<article>`, atau `<aside>`? Jika iya, bagaimana elemen tersebut membantu Anda dalam membuat static web? Jika tidak, mengapa tanpa elemen tersebut sudah memenuhi kebutuhan desain Anda?**
@@ -31,7 +123,7 @@ Jawab: Sesuai prinsip MVT, data disimpan di model supaya bisa diubah lewat Djang
  
 Jawab: `makemigrations` membuat file migrasi berdasarkan perubahan pada model, tanpa mengubah database. `migrate` mengeksekusi file migrasi tersebut ke database sehingga skemanya benar-benar berubah. Contoh nyata di project saya: saat model `Award` ditambahkan ke `models.py`, `python manage.py makemigrations` menghasilkan file `main/migrations/0004_award.py` yang mendeskripsikan tabel baru tersebut, namun database belum berubah sampai `python manage.py migrate` dijalankan untuk benar-benar membuat tabel `Award` di database.
 
-## Tugas 3
+### Tugas 3
 **1. Jelaskan mengapa kita menggunakan ModelForm pada Django alih-alih membuat form HTML secara manual. Selain itu, jelaskan pula mengapa kita diwajibkan menambahkan `{% csrf_token %}` pada form tersebut!**
 
 Jawab: Framework Django menyajikan alur kode yang lebih sistematis dan terstruktur, terutama mengenai pengelolaan database setiap kita ingin menambahkan atau mengurangi data tertentu. Jika menggunakan form HTML secara manual, saya harus menulis baris kode HTML satu per satu dan mengedit database secara manual. Kemudian, fungsi `{% csrf_token %}` sendiri bertugas untuk melindungi situs dari serangan CSRF (Cross-Site Request Forgery), yakni serangan yang dilakukan pihak ketiga yang ingin melakukan fraud ke situs tanpa sepengetahuan pengguna yang sedang login.
@@ -44,17 +136,13 @@ Jawab: `JSON` memiliki syntax yang lebih mudah dipahami dan ukuran berkas yang l
 
 Jawab: Saat URL diakses, fungsi view Django akan dipicu untuk mengambil data portofolio dari database menggunakan Object-Relational Mapping (ORM). Data tersebut kemudian harus melalui `serialization` untuk diubah dari objek Python (QuerySet) yang kompleks menjadi format data universal seperti dictionary atau teks string. `Serialization` dilakukan karena pada dasarnya situs tidak memahami objek internal `Django` sehingga data perlu diterjemahkan ke format yang netral. Terakhir, view membungkus data hasil serialisasi tersebut ke dalam `JsonResponse` untuk dikirimkan kembali ke klien melalui protokol HTTP.
 
-## Tugas 4
-*(Note: Pertanyaan refleksi ditiadakan pada Tugas 4)*
-### Deskripsi & Role-Based Access Control (RBAC)
-Tugas 4 mengimplementasikan autentikasi Django, cookie `last_login`, fitur interaktif Star (`ManyToManyField`), dan pembatasan hak akses berbasis 4 peran:
-1. **Pengunjung (Belum Login)**: Read-only. Tombol tambah/edit/hapus disembunyikan; aksi mutasi & klik bintang dialihkan ke `/login/`.
-2. **Regular User**: Bisa membaca dan memberi/mencabut bintang (Star/Unstar). Upaya mutasi data ditolak dengan HTTP `403 Forbidden`.
-3. **Editor (Group `Editor`)**: Memiliki hak regular user + hak mengedit/memperbarui data proyek dan award.
-4. **Superuser (Pemilik)**: Memiliki hak penuh (*CRUD*) data portofolio dan bintang.
-5. **Keamanan API**: Endpoint `/api/projects/` menyajikan data proyek dan `star_count` tanpa membocorkan data akun pengguna.
+### Tugas 4
+*(Catatan: Pertanyaan refleksi ditiadakan pada Tugas 4 sesuai instruksi tugas)*
 
-## AI Disclosure
+---
+
+# 3. AI Disclosure
+
 ### Tugas 1
 Saya menggunakan **Claude (Anthropic)** sebagai bantuan selama mengerjakan tugas ini, dengan rincian sebagai berikut:
  
@@ -101,7 +189,5 @@ Saya menggunakan **Google Antigravity** sebagai bantuan selama mengerjakan tugas
 **Strategi prompting:** Memberikan spesifikasi checklist izin akses secara langsung dan menempelkan pesan error traceback dari terminal agar diagnosis solusi tepat sasaran.
 
 **Keterbatasan AI yang saya temukan & Analisis Kritis:**
-1. **Pencemaran Data Lokal**: AI sempat mengeksekusi fungsi setup pengujian di shell pada database lokal `db.sqlite3` sehingga memunculkan data duplikat pada Experience dan Awards yang akhirnya harus saya bersihkan melalui query ORM.
-2. **Crash Django Admin di Python 3.14**: Terjadi error `AttributeError` pada `BaseContext.__copy__` karena perubahan standar library Python 3.14. AI awalnya salah mengira bug berasal dari model fields sehingga perlu investigasi traceback mendalam sebelum akhirnya diperbaiki dengan menambahkan patch adapter di `portofolio/__init__.py`.
-
-
+1. **Pencemaran Data Lokal**: AI sempat mengeksekusi fungsi setup pengujian di shell pada database lokal `db.sqlite3` sehingga memunculkan data duplikat pada Experience dan Awards, yang akhirnya harus saya bersihkan manual melalui query ORM.
+2. **Crash Django Admin di Python 3.14**: Terjadi error `AttributeError` pada `BaseContext.__copy__` karena perubahan standar library Python 3.14. AI awalnya salah mengira bug berasal dari model fields, sehingga perlu investigasi traceback mendalam sebelum akhirnya diperbaiki dengan menambahkan patch adapter di `portofolio/__init__.py`.
