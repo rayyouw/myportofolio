@@ -44,6 +44,16 @@ Jawab: `JSON` memiliki syntax yang lebih mudah dipahami dan ukuran berkas yang l
 
 Jawab: Saat URL diakses, fungsi view Django akan dipicu untuk mengambil data portofolio dari database menggunakan Object-Relational Mapping (ORM). Data tersebut kemudian harus melalui `serialization` untuk diubah dari objek Python (QuerySet) yang kompleks menjadi format data universal seperti dictionary atau teks string. `Serialization` dilakukan karena pada dasarnya situs tidak memahami objek internal `Django` sehingga data perlu diterjemahkan ke format yang netral. Terakhir, view membungkus data hasil serialisasi tersebut ke dalam `JsonResponse` untuk dikirimkan kembali ke klien melalui protokol HTTP.
 
+## Tugas 4
+*(Note: Pertanyaan refleksi ditiadakan pada Tugas 4)*
+### Deskripsi & Role-Based Access Control (RBAC)
+Tugas 4 mengimplementasikan autentikasi Django, cookie `last_login`, fitur interaktif Star (`ManyToManyField`), dan pembatasan hak akses berbasis 4 peran:
+1. **Pengunjung (Belum Login)**: Read-only. Tombol tambah/edit/hapus disembunyikan; aksi mutasi & klik bintang dialihkan ke `/login/`.
+2. **Regular User**: Bisa membaca dan memberi/mencabut bintang (Star/Unstar). Upaya mutasi data ditolak dengan HTTP `403 Forbidden`.
+3. **Editor (Group `Editor`)**: Memiliki hak regular user + hak mengedit/memperbarui data proyek dan award.
+4. **Superuser (Pemilik)**: Memiliki hak penuh (*CRUD*) data portofolio dan bintang.
+5. **Keamanan API**: Endpoint `/api/projects/` menyajikan data proyek dan `star_count` tanpa membocorkan data akun pengguna.
+
 ## AI Disclosure
 ### Tugas 1
 Saya menggunakan **Claude (Anthropic)** sebagai bantuan selama mengerjakan tugas ini, dengan rincian sebagai berikut:
@@ -80,5 +90,18 @@ Saya menggunakan **Github Copilot** sebagai bantuan selama mengerjakan tugas ini
 **Strategi prompting:** Saya memberikan potongan kode HTML/CSS dengan framework Django saya secara langsung, lalu menanyakan AI tentang penyebab bug secara spesifik dan optimasi yang bisa dilakukan.
  
 **Keterbatasan AI yang saya temukan:** AI beberapa kali men-generate code yang tidak sesuai sehingga menyebabkan website yang dihasilkan kurang enak untuk dilihat. Selain itu, AI juga beberapa kali kurang paham mengenai konteks project secara keseluruhan sehingga perlu intervensi dari saya.
+
+### Tugas 4
+Saya menggunakan **Google Antigravity** sebagai bantuan selama mengerjakan tugas ini, dengan rincian sebagai berikut:
+ 
+**Bagian yang dibantu AI:**
+1. Membantu penyusunan logika otorisasi server-side (`@login_required`, pengecekan group `Editor`, dan `PermissionDenied`) serta penyesuaian kondisional tombol pada template.
+2. Membantu merancang unit test komprehensif di `main/tests.py` untuk menguji hak akses 4 peran pengguna dan fitur toggle star.
+
+**Strategi prompting:** Memberikan spesifikasi checklist izin akses secara langsung dan menempelkan pesan error traceback dari terminal agar diagnosis solusi tepat sasaran.
+
+**Keterbatasan AI yang saya temukan & Analisis Kritis:**
+1. **Pencemaran Data Lokal**: AI sempat mengeksekusi fungsi setup pengujian di shell pada database lokal `db.sqlite3` sehingga memunculkan data duplikat pada Experience dan Awards yang akhirnya harus saya bersihkan melalui query ORM.
+2. **Crash Django Admin di Python 3.14**: Terjadi error `AttributeError` pada `BaseContext.__copy__` karena perubahan standar library Python 3.14. AI awalnya salah mengira bug berasal dari model fields sehingga perlu investigasi traceback mendalam sebelum akhirnya diperbaiki dengan menambahkan patch adapter di `portofolio/__init__.py`.
 
 
