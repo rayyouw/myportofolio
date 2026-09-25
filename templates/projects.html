@@ -40,18 +40,25 @@
                                         {% for highlight in project.highlights %}<li>{{ highlight }}</li>{% endfor %}
                                     </ul>
                                     <div class="project-actions">
-                                        {% include "components/project_star.html" with project=project %}
-                                        {% if user.is_superuser %}
+                                        {% if user.is_authenticated %}
+                                            {% include "components/project_star.html" with project=project %}
+                                        {% else %}
+                                            <a href="{% url 'main:login' %}?next={% url 'main:show_projects' %}" class="button button-star" title="Login to star this project">
+                                                <span aria-hidden="true">★</span> Star
+                                                <span class="star-count">{{ project.starred_by.count }}</span>
+                                            </a>
+                                        {% endif %}
+                                        {% if user.is_superuser or is_editor %}
                                             <a href="{% url 'main:update_project' project.id %}" class="button button-secondary">Edit Project</a>
                                         {% endif %}
-                                    {% if project.project_url or project.link %}
-                                        <a href="{{ project.project_url|default:project.link }}" class="project-link" target="_blank" rel="noopener">
-                                            View Project
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <path d="M7 17L17 7M17 7H7M17 7V17"/>
-                                            </svg>
-                                        </a>
-                                    {% endif %}
+                                        {% if project.project_url or project.link %}
+                                            <a href="{{ project.project_url|default:project.link }}" class="project-link" target="_blank" rel="noopener">
+                                                View Project
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                                                </svg>
+                                            </a>
+                                        {% endif %}
                                         {% if user.is_superuser %}
                                             {% include "components/project_delete_modal.html" with project=project %}
                                         {% endif %}

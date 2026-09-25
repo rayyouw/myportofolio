@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from django.contrib import messages
 from django.contrib.auth import login, logout
@@ -6,14 +7,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core import serializers
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect, render
 
-from main.forms import AccessCodeForm, AwardsForm, ProjectForm
+from main.forms import AwardsForm, ProjectForm
 
 from main.models import (
     Award,
+    Certificate,
     Education,
     Experience,
     Profile,
@@ -22,12 +24,20 @@ from main.models import (
 )
 
 
-ACCESS_CODE = getattr(settings, "PORTFOLIO_ACCESS_CODE", "rayhanfairuz")
+# ---------------------------------------------------------------------------
+# Role helpers
+# ---------------------------------------------------------------------------
+
+def _is_editor(user):
+    """Return True if the user belongs to the 'Editor' group."""
+    if not user.is_authenticated:
+        return False
+    return user.groups.filter(name="Editor").exists()
 
 
-def has_valid_access_code(request):
-    return AccessCodeForm(request.POST).is_valid() and request.POST["access_code"] == ACCESS_CODE
-
+# ---------------------------------------------------------------------------
+# Auth views
+# ---------------------------------------------------------------------------
 
 def register(request):
     form = UserCreationForm(request.POST or None)
@@ -71,19 +81,29 @@ def logout_user(request):
     return response
 
 
+# ---------------------------------------------------------------------------
+# Main / profile
+# ---------------------------------------------------------------------------
+
 def show_main(request):
     last_login = request.COOKIES.get("last_login", "No active login session / Cookie not found")
     context = {
-            "profile": Profile.objects.first(),
-            "last_login": last_login,
+        "profile": Profile.objects.first(),
+        "last_login": last_login,
+        "is_editor": _is_editor(request.user),
     }
     return render(request, "profile.html", context)
 
+
+# ---------------------------------------------------------------------------
+# Experience
+# ---------------------------------------------------------------------------
 
 def show_experience(request):
     experiences = Experience.objects.order_by("-started_at")
     context = {
         "profile": Profile.objects.first(),
+        "is_editor": _is_editor(request.user),
         "professional_experiences": experiences.filter(
             title__icontains="teaching assistant",
         ),
@@ -94,34 +114,36 @@ def show_experience(request):
     return render(request, "experience.html", context)
 
 
+# ---------------------------------------------------------------------------
+# Awards
+# ---------------------------------------------------------------------------
+
 def show_awards(request):
-    json_response = get_awards_json(request)
-    awards = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
+    awards = Award.objects.all()
     context = {
         "profile": Profile.objects.first(),
-        "award_list": [award.object for award in awards],
+        "is_editor": _is_editor(request.user),
+        "award_list": awards,
     }
     return render(request, "awards.html", context)
 
 
+@login_required(login_url="/login/")
 def create_awards(request):
+    """Only the portfolio owner (superuser) can create awards."""
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     form = AwardsForm(request.POST or None)
-    access_form = AccessCodeForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        if access_form.is_valid() and access_form.cleaned_data["access_code"] == ACCESS_CODE:
-            form.save()
-            messages.success(request, "Award baru berhasil ditambahkan!")
-            return redirect("main:show_awards")
-        access_form.add_error("access_code", "Kode akses salah.")
+        form.save()
+        messages.success(request, "Award baru berhasil ditambahkan!")
+        return redirect("main:show_awards")
 
     context = {
         "profile": Profile.objects.first(),
         "form": form,
-        "access_form": access_form,
         "form_title": "Tambah Award",
         "form_action": "main:create_awards",
         "submit_label": "Tambah Award",
@@ -129,28 +151,44 @@ def create_awards(request):
     return render(request, "awards_form.html", context)
 
 
+@login_required(login_url="/login/")
 def update_awards(request, awards_id):
+    """Superuser or Editor can update awards."""
+    if not (request.user.is_superuser or _is_editor(request.user)):
+        raise PermissionDenied
+
     award = get_object_or_404(Award, pk=awards_id)
     form = AwardsForm(request.POST or None, instance=award)
-    access_form = AccessCodeForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        if access_form.is_valid() and access_form.cleaned_data["access_code"] == ACCESS_CODE:
-            form.save()
-            messages.success(request, "Award berhasil diperbarui!")
-            return redirect("main:show_awards")
-        access_form.add_error("access_code", "Kode akses salah.")
+        form.save()
+        messages.success(request, "Award berhasil diperbarui!")
+        return redirect("main:show_awards")
 
     context = {
         "profile": Profile.objects.first(),
         "form": form,
-        "access_form": access_form,
         "form_title": "Edit Award",
         "form_action": "main:update_awards",
         "submit_label": "Simpan Perubahan",
         "award": award,
     }
     return render(request, "awards_form.html", context)
+
+
+@login_required(login_url="/login/")
+def delete_awards(request, awards_id):
+    """Only the portfolio owner (superuser) can delete awards."""
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    award = get_object_or_404(Award, pk=awards_id)
+
+    if request.method == "POST":
+        award.delete()
+        messages.success(request, "Award berhasil dihapus!")
+
+    return redirect("main:show_awards")
 
 
 def get_awards_json(request):
@@ -164,46 +202,46 @@ def get_awards_json(request):
     return HttpResponse(awards_json, content_type="application/json")
 
 
-def delete_awards(request, awards_id):
-    award = get_object_or_404(Award, pk=awards_id)
-
-    if request.method == "POST":
-        if has_valid_access_code(request):
-            award.delete()
-            messages.success(request, "Award berhasil dihapus!")
-        else:
-            messages.error(request, "Kode akses salah. Award tidak dihapus.")
-
-    return redirect("main:show_awards")
-
+# ---------------------------------------------------------------------------
+# Education
+# ---------------------------------------------------------------------------
 
 def show_education(request):
     context = {
         "profile": Profile.objects.first(),
+        "is_editor": _is_editor(request.user),
         "education_list": Education.objects.all(),
     }
     return render(request, "education.html", context)
 
 
+# ---------------------------------------------------------------------------
+# Skills
+# ---------------------------------------------------------------------------
+
 def show_skills(request):
     context = {
         "profile": Profile.objects.first(),
+        "is_editor": _is_editor(request.user),
         "skill_categories": SkillCategory.objects.prefetch_related("skills"),
     }
     return render(request, "skills.html", context)
 
 
+# ---------------------------------------------------------------------------
+# Projects
+# ---------------------------------------------------------------------------
+
 def show_projects(request):
-    json_response = get_projects_json(request)
-    projects = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    projects = [project.object for project in projects]
     title_query = request.GET.get("title", "").strip()
+    projects = Project.objects.all()
+
+    if title_query:
+        projects = projects.filter(title__icontains=title_query)
 
     context = {
         "profile": Profile.objects.first(),
+        "is_editor": _is_editor(request.user),
         "project_list": projects,
         "title_query": title_query,
     }
@@ -212,6 +250,7 @@ def show_projects(request):
 
 @login_required(login_url="/login/")
 def create_project(request):
+    """Only the portfolio owner (superuser) can create projects."""
     if not request.user.is_superuser:
         raise PermissionDenied
 
@@ -225,13 +264,17 @@ def create_project(request):
     context = {
         "profile": Profile.objects.first(),
         "form": form,
+        "form_title": "Tambah Proyek",
+        "form_action": "main:create_project",
+        "submit_label": "Tambah Proyek",
     }
     return render(request, "projects_form.html", context)
 
 
 @login_required(login_url="/login/")
 def update_project(request, project_id):
-    if not request.user.is_superuser:
+    """Superuser or Editor can update projects."""
+    if not (request.user.is_superuser or _is_editor(request.user)):
         raise PermissionDenied
 
     project = get_object_or_404(Project, pk=project_id)
@@ -249,27 +292,14 @@ def update_project(request, project_id):
         "form_action": "main:update_project",
         "submit_label": "Simpan Perubahan",
         "project": project,
+        "is_editor": _is_editor(request.user),
     }
     return render(request, "projects_form.html", context)
 
 
-def get_projects_json(request):
-    title_query = request.GET.get("title", "").strip()
-    projects = Project.objects.all()
-
-    if title_query:
-        projects = projects.filter(title__icontains=title_query)
-
-    projects_json = serializers.serialize(
-        "json",
-        projects,
-        use_natural_foreign_keys=True,
-    )
-    return HttpResponse(projects_json, content_type="application/json")
-
-
 @login_required(login_url="/login/")
 def delete_project(request, project_id):
+    """Only the portfolio owner (superuser) can delete projects."""
     if not request.user.is_superuser:
         raise PermissionDenied
 
@@ -282,8 +312,39 @@ def delete_project(request, project_id):
     return redirect("main:show_projects")
 
 
+def get_projects_json(request):
+    """
+    Public JSON endpoint for projects.
+    Returns only safe fields — excludes starred_by to prevent
+    leaking user account information.
+    """
+    title_query = request.GET.get("title", "").strip()
+    projects = Project.objects.all()
+
+    if title_query:
+        projects = projects.filter(title__icontains=title_query)
+
+    safe_fields = [
+        "id", "title", "description", "tech_stack",
+        "project_url", "project_image_url", "image",
+        "tags", "year", "highlights", "link", "order",
+    ]
+
+    data = []
+    for project in projects:
+        entry = {field: getattr(project, field) for field in safe_fields}
+        entry["star_count"] = project.starred_by.count()
+        data.append(entry)
+
+    return JsonResponse(data, safe=False)
+
+
 @login_required(login_url="/login/")
 def toggle_star(request, project_id):
+    """
+    Toggle star on a project (max one star per user).
+    Requires login; any authenticated user may star/unstar.
+    """
     project = get_object_or_404(Project, pk=project_id)
 
     if request.method == "POST":
@@ -293,3 +354,28 @@ def toggle_star(request, project_id):
             project.starred_by.add(request.user)
 
     return redirect("main:show_projects")
+
+
+# ---------------------------------------------------------------------------
+# Certificates
+# ---------------------------------------------------------------------------
+
+def show_certificates(request):
+    certificates = Certificate.objects.all()
+    context = {
+        "profile": Profile.objects.first(),
+        "is_editor": _is_editor(request.user),
+        "award_list": list(certificates),
+    }
+    return render(request, "certificate.html", context)
+
+
+def get_certificates_json(request):
+    title_query = request.GET.get("title", "").strip()
+    certificates = Certificate.objects.all()
+
+    if title_query:
+        certificates = certificates.filter(title__icontains=title_query)
+
+    certificates_json = serializers.serialize("json", certificates)
+    return HttpResponse(certificates_json, content_type="application/json")

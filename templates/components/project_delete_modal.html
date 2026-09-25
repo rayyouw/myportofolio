@@ -3,10 +3,8 @@
     <button type="button" class="project-delete-modal__backdrop" popovertarget="delete-project-{{ project.id }}" popovertargetaction="hide" aria-label="Tutup konfirmasi hapus"></button>
     <div class="project-delete-modal__content">
         <button type="button" class="project-delete-modal__close" popovertarget="delete-project-{{ project.id }}" popovertargetaction="hide" aria-label="Tutup konfirmasi hapus">&times;</button>
-        <h2 class = "delete-form-text" id="delete-project-title-{{ project.id }}">Hapus Proyek?</h2>
-        <p class = "delete-form-text">Apakah Anda yakin ingin menghapus <strong>{{ project.title }}</strong>?</p>
-        <label for="project-access-code-{{ project.id }}">Kode akses</label>
-        <input id="project-access-code-{{ project.id }}" type="password" name="access_code" placeholder="Masukkan kode akses" autocomplete="off" required form="delete-project-form-{{ project.id }}">
+        <h2 class="delete-form-text" id="delete-project-title-{{ project.id }}">Hapus Proyek?</h2>
+        <p class="delete-form-text">Apakah Anda yakin ingin menghapus <strong>{{ project.title }}</strong>?</p>
         <div class="project-delete-modal__actions">
             <button type="button" class="button button-secondary" popovertarget="delete-project-{{ project.id }}" popovertargetaction="hide">Batal</button>
             <form id="delete-project-form-{{ project.id }}" method="post" action="{% url 'main:delete_project' project.id %}">

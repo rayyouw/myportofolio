@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block meta %}
-    <title>Awards - {{ profile.name }}</title>
+    <title>Certificate - {{ profile.name }}</title>
 {% endblock meta %}
 {% block content %}
     <main>
@@ -9,20 +9,18 @@
             <div class="container">
                 <div class="page-grid">
                     <div class="page-heading">
-                        <h1>AWARDS</h1>
+                        <h1>CERTIFICATE</h1>
                     </div>
                     <div class="page-content">
                         {% if messages %}
                             {% for message in messages %}<p class="{% if message.tags == 'error' %}form-error{% else %}form-success{% endif %}">{{ message }}</p>{% endfor %}
                         {% endif %}
                         <div class="project-header">
-                            <p class="project-kicker">Pencapaian yang saya raih</p>
-                            {% if user.is_superuser %}
-                                <a href="{% url 'main:create_awards' %}" class="button project-add-button">+ Tambah Award</a>
-                            {% endif %}
+                            <p class="project-kicker">Sertifikat yang saya dapatkan</p>
+                            <a href="{% url 'main:create_awards' %}" class="button project-add-button">+ Tambah Sertifikat</a>
                         </div>
                         <div class="awards-list">
-                    {% for award in award_list %}
+                    {% for certif in award_list %}
                         <article class="awards-item">
                             <div class="item-row">
                                 {% if award.thumbnail %}
@@ -33,14 +31,10 @@
                                 </div>
                             </div>
                             <p>{{ award.description }}</p>
-                            {% if user.is_superuser or is_editor %}
-                                <div class="project-actions">
-                                    <a href="{% url 'main:update_awards' award.id %}" class="button button-secondary">Edit Award</a>
-                                    {% if user.is_superuser %}
-                                        {% include "components/award_delete_modal.html" with award=award %}
-                                    {% endif %}
-                                </div>
-                            {% endif %}
+                            <div class="project-actions">
+                                <a href="{% url 'main:update_awards' award.id %}" class="button button-secondary">Edit Award</a>
+                            {% include "components/award_delete_modal.html" with award=award %}
+                            </div>
                         </article>
                     {% empty %}
                         <p class="empty-state">No awards have been added yet.</p>
