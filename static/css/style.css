@@ -16,7 +16,7 @@
     --card-bg: linear-gradient(145deg, rgba(30, 43, 67, 0.32), rgba(5, 11, 24, 0.08));
     --nav-bg: rgba(10, 16, 32, 0.82);
     --input-bg: #fff;
-    --about-bg: #10263a;
+    --icon-surface: rgba(79, 224, 255, 0.08);
     --radius: 4px;
     --header-space: 6rem;
 }
@@ -32,7 +32,7 @@
     --card-bg: linear-gradient(145deg, #ffffff, #edf2f8);
     --nav-bg: rgba(255, 255, 255, 0.9);
     --input-bg: #ffffff;
-    --about-bg: #e5f4fa;
+    --icon-surface: rgba(8, 126, 155, 0.08);
 }
 
 :root[data-theme="dark"] {
@@ -261,9 +261,6 @@ section[id] {
 /* Menempatkan blok detail (bio, meta, tombol) ke area grid "details" */
 .hero-details {
     grid-area: details;
-    padding: 1.25rem;
-    border-radius: 14px;
-    background: var(--about-bg);
 }
 
 /* Teks kecil di atas judul utama sebagai penanda kategori/afiliasi */
@@ -410,24 +407,59 @@ section[id] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border: 1px solid var(--line);
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--accent-dark);
     border-radius: 50%;
-    color: var(--ink);
-    transition: background-color 0.2s ease, color 0.2s ease;
+    background: var(--icon-surface);
+    color: var(--accent-dark);
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 /* Ukuran ikon SVG di dalam tombol ikon bulat */
 .icon-btn svg {
     width: 18px;
     height: 18px;
+    display: block;
+    stroke: currentColor;
+    stroke-width: 2.25;
 }
 
 /* Warna tombol ikon berbalik (invert) saat di-hover */
 .icon-btn:hover {
     background-color: var(--ink);
     color: var(--paper);
+    transform: translateY(-2px);
+}
+
+.hero-identity h1 .name-word {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.hero-identity h1 .name-letter {
+    display: inline-block;
+    opacity: 0;
+    animation: name-letter-in 550ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+    animation-delay: calc(var(--letter-index) * 55ms);
+}
+
+@keyframes name-letter-in {
+    from {
+        opacity: 0;
+        transform: translateX(var(--letter-start)) translateY(0.12em);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-identity h1 .name-letter {
+        opacity: 1;
+        animation: none;
+    }
 }
 
 /* CAROUSEL */

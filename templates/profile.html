@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block meta %}
     <title>{{ profile.name }} - Portfolio</title>
@@ -11,7 +12,7 @@
               <div class="container hero-grid">
                   <div class="hero-identity">
                       <p class="hero-kicker">{{ profile.study_program }} &middot; Universitas Indonesia</p>
-                      <h1>{{ profile.name }}</h1>
+                      <h1 id="animated-name" aria-label="{{ profile.name }}">{{ profile.name }}</h1>
                   </div>
                   <div class="hero-photo">
                       <img class="avatar" src="{{ profile.photo }}" alt="Photo of {{ profile.name }}">
@@ -87,5 +88,6 @@
             {% endfor %}
         </div>
     </div>
+    <script src="{% static 'js/profile-name-animation.js' %}"></script>
 
 {% endblock content %}
