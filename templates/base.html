@@ -41,5 +41,21 @@
     </footer>
     <script src="{% static 'js/utils.js' %}"></script>
     {% include 'components/toast.html' %}
+    
+    {% if messages %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            {% for message in messages %}
+                {% if message.tags == 'error' %}
+                    showToast('Error', "{{ message|escapejs }}", 'error');
+                {% elif message.tags == 'success' %}
+                    showToast('Success', "{{ message|escapejs }}", 'success');
+                {% else %}
+                    showToast('Notification', "{{ message|escapejs }}", 'normal');
+                {% endif %}
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
 </body>
 </html>
