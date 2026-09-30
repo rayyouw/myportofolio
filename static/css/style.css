@@ -1337,18 +1337,21 @@ section[id] {
 /* toast */
 .toast-component {
     position: fixed;
-    inset: auto 2rem 2rem auto;
+    inset: auto 1.5rem 1.5rem auto;
+    max-width: min(26rem, calc(100vw - 2rem));
     margin: 0;
-    padding: 1rem 1.5rem;
-    border-radius: var(--radius);
-    box-shadow: 0 10px 25px rgba(28, 25, 23, 0.15);
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
     display: none;
     align-items: center;
     gap: 1rem;
-    transition: all 0.3s ease;
-    background-color: var(--paper);
-    border: 1px solid var(--line);
-    color: inherit;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    background: #142238;
+    border: 1px solid #344967;
+    border-left: 4px solid #79d8ff;
+    color: #f4f7fb;
+    z-index: 1000;
 }
 
 .toast-component:popover-open {
@@ -1371,24 +1374,34 @@ section[id] {
     font-weight: 700;
     margin-bottom: 0.15rem;
     font-family: "Space Grotesk", -apple-system, sans-serif;
+    color: #f4f7fb;
 }
 
 .toast-message {
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: #c5d2e3;
+    overflow-wrap: anywhere;
 }
 
 /* Change the left border based on the notification type */
 .toast-success {
-    border-left: 4px solid #22c55e;
+    border-left-color: #4ade80;
 }
 
 .toast-error {
-    border-left: 4px solid #b42318;
+    border-left-color: #ff7777;
 }
 
 .toast-normal {
-    border-left: 4px solid var(--accent);
+    border-left-color: #79d8ff;
+}
+
+@media (max-width: 600px) {
+    .toast-component {
+        inset: auto 1rem 1rem 1rem;
+        max-width: none;
+        padding: 0.9rem 1rem;
+    }
 }
 
 /* Project form modal */
