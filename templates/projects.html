@@ -57,6 +57,7 @@
     const BASE_PROJECTS_ENDPOINT = "{% url 'main:get_projects_json' %}";
     const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
     let projectsAbortController;
+    let hasShownProjectsLoadedToast = false;
 
     // DOM elements
     const loadingState = document.getElementById('loading');
@@ -199,6 +200,11 @@
             if (!response.ok) throw new Error('Failed to fetch data');
 
             const projectData = await response.json();
+
+            if (!hasShownProjectsLoadedToast) {
+                hasShownProjectsLoadedToast = true;
+                showToast('System Notification', 'Project loaded successfully!', 'success');
+            }
 
             if (projectData.length === 0) {
                 displayPageSection({ showEmpty: true });

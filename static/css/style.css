@@ -11,8 +11,30 @@
     --paper: #050b18;
     --line: #1e2b43;
     --text-muted: #a9b5c8;
+    --accent: #4fe0ff;
+    --accent-dark: #79d8ff;
+    --card-bg: linear-gradient(145deg, rgba(30, 43, 67, 0.32), rgba(5, 11, 24, 0.08));
+    --nav-bg: rgba(10, 16, 32, 0.82);
+    --input-bg: #fff;
     --radius: 4px;
     --header-space: 6rem;
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+    --ink: #202b3c;
+    --paper: #f5f7fb;
+    --line: #d8e0eb;
+    --text-muted: #586579;
+    --accent: #087e9b;
+    --accent-dark: #08728c;
+    --card-bg: linear-gradient(145deg, #ffffff, #edf2f8);
+    --nav-bg: rgba(255, 255, 255, 0.9);
+    --input-bg: #ffffff;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
 }
 
 /* Pengaturan dasar body: font, warna teks, warna latar, dan jarak antar baris */
@@ -73,7 +95,7 @@ section[id] {
     width: 100%;
     padding: 0.5rem 1.2rem;
     border-radius: 999px;
-    background: rgba(10, 16, 32, 0.75);
+    background: var(--nav-bg);
     border: 1px solid var(--line);
     backdrop-filter: blur(12px);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
@@ -120,6 +142,27 @@ section[id] {
     text-shadow: 0 0 8px rgba(79, 224, 255, 0.7);
 }
 
+.navbar-pill nav .theme-toggle {
+    appearance: none;
+    align-self: center;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.navbar-pill nav .theme-toggle:hover,
+.navbar-pill nav .theme-toggle:focus-visible {
+    background: var(--ink);
+    color: var(--paper);
+}
+
 .star-form {
     display: inline;
 }
@@ -133,8 +176,14 @@ section[id] {
 }
 
 .button-star.is-starred {
-    background: var(--accent);
-    color: var(--paper);
+    background: #f5c451;
+    color: #29200c;
+    border-color: #e4ad30;
+}
+
+.button-star.is-starred:hover {
+    background: #ffd875;
+    color: #29200c;
 }
 
 .star-count {
@@ -477,7 +526,7 @@ section[id] {
     padding: 0.25rem;
     border: 1px solid var(--line);
     border-radius: 999px;
-    background: rgba(5, 11, 24, 0.45);
+    background: var(--input-bg);
 }
 
 .experience-tab {
@@ -562,7 +611,7 @@ section[id] {
     border: 1px solid var(--line);
     border-radius: 10px;
     padding: 1.25rem;
-    background: linear-gradient(145deg, rgba(30, 43, 67, 0.32), rgba(5, 11, 24, 0.08));
+    background: var(--card-bg);
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -586,7 +635,7 @@ section[id] {
     border: 1px solid var(--line);
     border-radius: 10px;
     padding: 1.25rem;
-    background: linear-gradient(145deg, rgba(30, 43, 67, 0.32), rgba(5, 11, 24, 0.08));
+    background: var(--card-bg);
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -716,7 +765,7 @@ section[id] {
     border: 1px solid var(--line);
     border-radius: 10px;
     padding: 1.5rem;
-    background: linear-gradient(145deg, rgba(30, 43, 67, 0.32), rgba(5, 11, 24, 0.08));
+    background: var(--card-bg);
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -979,7 +1028,7 @@ section[id] {
     width: 100%;
     height: 100%;
     border: 0;
-    background: rgba(5, 11, 24, 0.75);
+    background: color-mix(in srgb, var(--paper) 78%, transparent);
 }
 
 .project-delete-modal__content {
@@ -1274,7 +1323,7 @@ section[id] {
     border: 1px solid var(--line);
     border-radius: 10px;
     padding: 1.25rem;
-    background: linear-gradient(145deg, rgba(30, 43, 67, 0.32), rgba(5, 11, 24, 0.08));
+    background: var(--card-bg);
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -1347,10 +1396,10 @@ section[id] {
     align-items: center;
     gap: 1rem;
     transition: opacity 0.25s ease, transform 0.25s ease;
-    background: #142238;
-    border: 1px solid #344967;
-    border-left: 4px solid #79d8ff;
-    color: #f4f7fb;
+    background: #faf7f1;
+    border: 1px solid #e4dbcc;
+    border-left: 4px solid #22c55e;
+    color: #292722;
     z-index: 1000;
 }
 
@@ -1374,18 +1423,18 @@ section[id] {
     font-weight: 700;
     margin-bottom: 0.15rem;
     font-family: "Space Grotesk", -apple-system, sans-serif;
-    color: #f4f7fb;
+    color: #292722;
 }
 
 .toast-message {
     font-size: 0.85rem;
-    color: #c5d2e3;
+    color: #68645d;
     overflow-wrap: anywhere;
 }
 
 /* Change the left border based on the notification type */
 .toast-success {
-    border-left-color: #4ade80;
+    border-left-color: #22c55e;
 }
 
 .toast-error {
