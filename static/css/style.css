@@ -16,6 +16,7 @@
     --card-bg: linear-gradient(145deg, rgba(30, 43, 67, 0.32), rgba(5, 11, 24, 0.08));
     --nav-bg: rgba(10, 16, 32, 0.82);
     --input-bg: #fff;
+    --about-bg: #10263a;
     --radius: 4px;
     --header-space: 6rem;
 }
@@ -31,6 +32,7 @@
     --card-bg: linear-gradient(145deg, #ffffff, #edf2f8);
     --nav-bg: rgba(255, 255, 255, 0.9);
     --input-bg: #ffffff;
+    --about-bg: #e5f4fa;
 }
 
 :root[data-theme="dark"] {
@@ -259,6 +261,9 @@ section[id] {
 /* Menempatkan blok detail (bio, meta, tombol) ke area grid "details" */
 .hero-details {
     grid-area: details;
+    padding: 1.25rem;
+    border-radius: 14px;
+    background: var(--about-bg);
 }
 
 /* Teks kecil di atas judul utama sebagai penanda kategori/afiliasi */
@@ -353,18 +358,6 @@ section[id] {
     grid-area: photo;
     align-self: center;
     position: relative;
-}
-
-/* Blok warna aksen di belakang foto sebagai elemen dekoratif berlapis */
-.photo-block {
-    position: absolute;
-    top: 1.25rem;
-    left: 1.25rem;
-    width: 100%;
-    height: 100%;
-    background-color: var(--accent);
-    border-radius: var(--radius);
-    z-index: 0;
 }
 
 /* Foto profil ditampilkan persegi dengan border dan berada di lapisan paling atas */
