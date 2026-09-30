@@ -281,7 +281,7 @@ section[id] {
 
 /* Paragraf bio dengan lebar terbatas dan perataan justify agar mudah dibaca */
 .bio {
-    color: var(--text-muted);
+    color: var(--ink);
     max-width: 480px;
     margin-bottom: 1.5rem;
     text-align: justify;
@@ -289,19 +289,16 @@ section[id] {
 
 /* Menyorot kata kunci tertentu di dalam bio dengan warna aksen */
 .bio-highlight {
-    color: var(--accent-dark);
+    color: inherit;
     font-weight: 700;
 }
 
 /* Menyorot angka statistik di bio dengan badge berwarna */
 .bio-number {
     display: inline-block;
-    color: var(--ink);
-    background-color: var(--accent);
+    color: inherit;
+    background-color: transparent;
     font-weight: 700;
-    padding: 0 0.25rem;
-    border-radius: 2px;
-    line-height: 1.25;
 }
 
 /* Daftar meta info (NPM, Program Studi) disusun sejajar horizontal */
