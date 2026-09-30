@@ -1,6 +1,8 @@
 import datetime
 import json
 
+from django.views.decorators.http import require_POST
+
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -234,16 +236,11 @@ def show_skills(request):
 
 def show_projects(request):
     title_query = request.GET.get("title", "").strip()
-    projects = Project.objects.all()
-
-    if title_query:
-        projects = projects.filter(title__icontains=title_query)
-
     context = {
         "profile": Profile.objects.first(),
         "is_editor": _is_editor(request.user),
-        "project_list": projects,
         "title_query": title_query,
+        "form": ProjectForm(),
     }
     return render(request, "projects.html", context)
 
@@ -313,28 +310,31 @@ def delete_project(request, project_id):
 
 
 def get_projects_json(request):
-    """
-    Public JSON endpoint for projects.
-    Returns only safe fields — excludes starred_by to prevent
-    leaking user account information.
-    """
     title_query = request.GET.get("title", "").strip()
-    projects = Project.objects.all()
+    projects = Project.objects.prefetch_related('starred_by').all()
 
     if title_query:
         projects = projects.filter(title__icontains=title_query)
 
-    safe_fields = [
-        "id", "title", "description", "tech_stack",
-        "project_url", "project_image_url", "image",
-        "tags", "year", "highlights", "link", "order",
-    ]
-
+    # Manually build the JSON data so we can add the Star logic
     data = []
     for project in projects:
-        entry = {field: getattr(project, field) for field in safe_fields}
-        entry["star_count"] = project.starred_by.count()
-        data.append(entry)
+        starred_users = project.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join([u.username for u in starred_users])
+        data.append({
+            "pk": str(project.id),
+            "fields": {
+                "title": project.title,
+                "description": project.description,
+                "tech_stack": project.tech_stack,
+                "project_url": project.project_url,
+                "project_image_url": project.project_image_url,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            }
+        })
 
     return JsonResponse(data, safe=False)
 
@@ -354,6 +354,25 @@ def toggle_star(request, project_id):
             project.starred_by.add(request.user)
 
     return redirect("main:show_projects")
+
+
+@require_POST
+def create_project_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Only the portfolio owner can add projects."},
+            status=403,
+        )
+
+    form = ProjectForm(request.POST)
+    if form.is_valid():
+        project = form.save()
+        return JsonResponse(
+            {"message": "Project added successfully.", "pk": str(project.id)},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 
 # ---------------------------------------------------------------------------
