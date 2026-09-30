@@ -12,6 +12,7 @@ from main.views import (
     create_project_ajax,
     update_project,
     create_awards,
+    create_awards_ajax,
     update_awards,
     get_projects_json,
     get_awards_json,
@@ -22,6 +23,7 @@ from main.views import (
     login_user,
     logout_user,
     toggle_star,
+    toggle_star_award,
 )
 
 app_name = "main"
@@ -34,8 +36,10 @@ urlpatterns = [
     path("experience/", show_experience, name="show_experience"),
     path("awards/", show_awards, name="show_awards"),
     path("awards/add/", create_awards, name="create_awards"),
+    path("awards/add-ajax/", create_awards_ajax, name="create_awards_ajax"),
     path("awards/<int:awards_id>/edit/", update_awards, name="update_awards"),
     path("awards/<int:awards_id>/delete/", delete_awards, name="delete_awards"),
+    path("awards/<int:award_id>/star/", toggle_star_award, name="toggle_star_award"),
     path("education/", show_education, name="show_education"),
     path("skills/", show_skills, name="show_skills"),
     path("projects/", show_projects, name="show_projects"),

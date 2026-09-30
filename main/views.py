@@ -121,11 +121,12 @@ def show_experience(request):
 # ---------------------------------------------------------------------------
 
 def show_awards(request):
-    awards = Award.objects.all()
+    title_query = request.GET.get("title", "").strip()
     context = {
         "profile": Profile.objects.first(),
         "is_editor": _is_editor(request.user),
-        "award_list": awards,
+        "title_query": title_query,
+        "form": AwardsForm(),
     }
     return render(request, "awards.html", context)
 
@@ -174,6 +175,7 @@ def update_awards(request, awards_id):
         "form_action": "main:update_awards",
         "submit_label": "Simpan Perubahan",
         "award": award,
+        "is_editor": _is_editor(request.user),
     }
     return render(request, "awards_form.html", context)
 
@@ -195,13 +197,62 @@ def delete_awards(request, awards_id):
 
 def get_awards_json(request):
     title_query = request.GET.get("title", "").strip()
-    awards = Award.objects.all()
+    awards = Award.objects.prefetch_related('starred_by').all()
 
     if title_query:
         awards = awards.filter(title__icontains=title_query)
 
-    awards_json = serializers.serialize("json", awards)
-    return HttpResponse(awards_json, content_type="application/json")
+    data = []
+    for award in awards:
+        starred_users = award.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join([u.username for u in starred_users])
+        data.append({
+            "pk": str(award.id),
+            "fields": {
+                "title": award.title,
+                "description": award.description,
+                "thumbnail": award.thumbnail,
+                "created_at": award.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
+
+
+@require_POST
+def create_awards_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Only the portfolio owner can add awards."},
+            status=403,
+        )
+
+    form = AwardsForm(request.POST)
+    if form.is_valid():
+        award = form.save()
+        return JsonResponse(
+            {"message": "Award added successfully.", "pk": str(award.id)},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
+
+
+@login_required(login_url="/login/")
+def toggle_star_award(request, award_id):
+    award = get_object_or_404(Award, pk=award_id)
+
+    if request.method == "POST":
+        if request.user in award.starred_by.all():
+            award.starred_by.remove(request.user)
+        else:
+            award.starred_by.add(request.user)
+
+    return redirect("main:show_awards")
 
 
 # ---------------------------------------------------------------------------

@@ -30,6 +30,7 @@ class Award(models.Model):
     description = models.CharField(max_length=255)
     thumbnail = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    starred_by = models.ManyToManyField(User, related_name="starred_awards", blank=True)
 
     def __str__(self):
         return self.title
