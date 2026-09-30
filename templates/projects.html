@@ -128,7 +128,7 @@
             .replace('0', projectId);
 
         const deleteHtml = IS_SUPERUSER
-            ? `<form id="delete-project-form-${projectId}" method="post" action="${deleteUrl}">
+            ? `<form id="delete-project-form-${projectId}" method="post" action="${deleteUrl}" data-loading-title="Processing" data-loading-message="Deleting project...">
                     {% csrf_token %}
                     <button type="submit" class="button button-danger"
                             onclick="return confirm('Apakah Anda yakin ingin menghapus proyek ini?');">Hapus</button>
@@ -156,7 +156,7 @@
             ${highlightsHtml}
             <div class="project-actions">
                 {% if user.is_authenticated %}
-                    <form method="post" action="${starUrl}" class="star-form">
+                    <form method="post" action="${starUrl}" class="star-form" data-loading-title="Processing" data-loading-message="${project.is_starred ? 'Removing star...' : 'Adding star...'}">
                         {% csrf_token %}
                         <button type="submit" class="button button-star${isStarredClass}" title="${starTitle}">
                             <span aria-hidden="true">★</span>
@@ -237,6 +237,7 @@
 
         const submitButton = projectForm.querySelector('button[type="submit"]');
         submitButton.disabled = true;
+        showToast('Processing', 'Adding project...', 'normal', 30000);
 
         try {
             const response = await fetch(CREATE_PROJECT_ENDPOINT, {

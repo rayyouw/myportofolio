@@ -97,7 +97,7 @@
             .replace('0', awardId);
 
         const deleteHtml = IS_SUPERUSER
-            ? `<form id="delete-award-form-${awardId}" method="post" action="${deleteUrl}">
+            ? `<form id="delete-award-form-${awardId}" method="post" action="${deleteUrl}" data-loading-title="Processing" data-loading-message="Deleting award...">
                     {% csrf_token %}
                     <button type="submit" class="button button-danger"
                             onclick="return confirm('Apakah Anda yakin ingin menghapus award ini?');">Hapus</button>
@@ -125,7 +125,7 @@
 
         const authStarHtml = `
             {% if user.is_authenticated %}
-                <form method="post" action="${starUrl}" class="star-form">
+                <form method="post" action="${starUrl}" class="star-form" data-loading-title="Processing" data-loading-message="${award.is_starred ? 'Removing star...' : 'Adding star...'}">
                     {% csrf_token %}
                     <button type="submit" class="button button-star${isStarredClass}" title="${starTitle}">
                         <span aria-hidden="true">★</span>
@@ -212,6 +212,7 @@
 
         const submitButton = awardForm.querySelector('button[type="submit"]');
         submitButton.disabled = true;
+        showToast('Processing', 'Adding award...', 'normal', 30000);
 
         try {
             const response = await fetch(CREATE_AWARD_ENDPOINT, {

@@ -249,8 +249,10 @@ def toggle_star_award(request, award_id):
     if request.method == "POST":
         if request.user in award.starred_by.all():
             award.starred_by.remove(request.user)
+            messages.success(request, "Star removed from award.")
         else:
             award.starred_by.add(request.user)
+            messages.success(request, "Award starred successfully.")
 
     return redirect("main:show_awards")
 
@@ -407,8 +409,10 @@ def toggle_star(request, project_id):
     if request.method == "POST":
         if request.user in project.starred_by.all():
             project.starred_by.remove(request.user)
+            messages.success(request, "Star removed from project.")
         else:
             project.starred_by.add(request.user)
+            messages.success(request, "Project starred successfully.")
 
     return redirect("main:show_projects")
 
