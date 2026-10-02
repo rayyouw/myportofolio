@@ -92,6 +92,14 @@ Proyek ini adalah website portofolio pribadi berbasis Django yang dikembangkan s
 - **Fitur Interaktif Star**: Relasi `ManyToManyField` `starred_by` pada model `Project` untuk mekanisme satu bintang per pengguna, dilengkapi endpoint `toggle_star` dengan verifikasi CSRF.
 - **Keamanan Data & Integritas API**: Endpoint `/api/projects/` menyajikan data proyek dan agregat `star_count` tanpa membocorkan identitas pengguna yang membintangi proyek.
 
+#### **Tugas 5: AJAX, Debouncing, Modal, Toast, & XSS Protection**
+- Menerapkan pola AJAX Tutorial 05 pada halaman **Awards**, bukan hanya halaman Projects: halaman merender skeleton, lalu memuat data dari `/api/awards/` dengan `fetch()` dan `JsonResponse`.
+- Menyediakan loading, empty, dan error state serta pencarian judul dengan debounce 300 ms.
+- Superuser dapat menambahkan award lewat modal dan Fetch API. Endpoint memvalidasi `AwardsForm`, memeriksa izin di server, menerima CSRF token, dan mengembalikan status JSON yang sesuai. Data diperbarui tanpa memuat ulang halaman.
+- Endpoint JSON tetap dapat dibaca pengunjung anonim dan menyertakan jumlah star serta status star untuk pengguna yang sedang login.
+- Menampilkan toast sukses dan kegagalan, termasuk pesan validasi server. `AwardsForm` membersihkan judul dan deskripsi dengan `strip_tags`; data JSON di-escape dengan `escapeHtml` sebelum dimasukkan ke HTML.
+- Menambahkan tes untuk skeleton halaman, endpoint publik, status star per pengguna, izin tambah award, dan pembersihan input.
+
 ---
 
 # 2. Reflective Questions
@@ -138,6 +146,20 @@ Jawab: Saat URL diakses, fungsi view Django akan dipicu untuk mengambil data por
 
 ### Tugas 4
 *(Catatan: Pertanyaan refleksi ditiadakan pada Tugas 4 sesuai instruksi tugas)*
+
+### Assignment 5
+
+1. **What is debouncing, and why is it useful for AJAX search?**
+
+   Debouncing delays a function until a short period has passed without another input event. In this project, the search waits 300 milliseconds after the user stops typing before sending a request. This avoids sending a request for every keystroke, reduces unnecessary server work, and keeps the displayed results aligned with the latest query.
+
+2. **What is the purpose of `await` with `fetch()`? What happens without it?**
+
+   `fetch()` returns a Promise because the browser needs time to receive the response. `await` pauses the current `async` function until that Promise settles, so the next lines can safely inspect the response and parse its JSON. Without `await` (or an equivalent `.then()` chain), the variable contains a Promise rather than the response data; code that expects fields from the response would run too early and fail or display incomplete data.
+
+3. **What is an XSS attack, and why does JavaScript-rendered AJAX data need care?**
+
+   Cross-Site Scripting (XSS) happens when untrusted content is interpreted as executable HTML or JavaScript in another user's browser. Django templates escape variable output by default. Data returned as JSON does not receive that template escaping when JavaScript inserts it into the page, especially through `innerHTML`. This project escapes values with `escapeHtml` before building HTML and strips tags from award text in the server-side `ModelForm`; using `textContent` for plain text is another safe option.
 
 ---
 
@@ -191,3 +213,15 @@ Saya menggunakan **Google Antigravity** sebagai bantuan selama mengerjakan tugas
 **Keterbatasan AI yang saya temukan & Analisis Kritis:**
 1. **Pencemaran Data Lokal**: AI sempat mengeksekusi fungsi setup pengujian di shell pada database lokal `db.sqlite3` sehingga memunculkan data duplikat pada Experience dan Awards, yang akhirnya harus saya bersihkan manual melalui query ORM.
 2. **Crash Django Admin di Python 3.14**: Terjadi error `AttributeError` pada `BaseContext.__copy__` karena perubahan standar library Python 3.14. AI awalnya salah mengira bug berasal dari model fields, sehingga perlu investigasi traceback mendalam sebelum akhirnya diperbaiki dengan menambahkan patch adapter di `portofolio/__init__.py`.
+
+### Tugas 5
+Saya menggunakan **OpenAI Codex** sebagai AI coding assistant untuk meninjau implementasi Assignment 5 dan membantu menyelesaikan dokumentasi serta verifikasi.
+
+**Bagian yang dibantu AI:**
+1. Membandingkan halaman Awards, endpoint JSON, form AJAX, peran pengguna, dan perlindungan XSS dengan checklist Assignment 5.
+2. Memperbarui tes yang sebelumnya mengharapkan data Awards dan Projects dirender langsung di HTML, agar memeriksa skeleton AJAX dan endpoint JSON.
+3. Menambahkan jawaban refleksi Assignment 5 dan ringkasan progres serta pengungkapan bantuan AI ini di README.
+
+**Strategi prompting dan ringkasan riwayat:** Saya memberikan checklist Assignment 5, meminta audit terhadap kode yang sudah ada, lalu meminta perubahan yang belum terpenuhi dan verifikasi dengan tes. Riwayat prompt lengkap tersimpan pada percakapan Codex yang digunakan untuk pekerjaan ini; prompt utamanya meminta evaluasi seluruh checklist dan implementasi bagian yang belum terpenuhi.
+
+**Keterbatasan AI yang ditemukan:** Tes lama gagal karena masih mengasumsikan data dirender server-side, padahal halaman Awards dan Projects sudah memakai AJAX. Setelah membandingkan kegagalan dengan arsitektur halaman, tes diperbarui untuk menguji skeleton dan endpoint, bukan mengubah halaman kembali ke render server-side. Tes otomatis juga tidak menggantikan pemeriksaan manual tampilan di browser.

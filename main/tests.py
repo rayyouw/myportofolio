@@ -3,6 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from main.forms import AwardsForm
 from main.models import Award, Experience, Project
 
 
@@ -74,16 +75,17 @@ class MainTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "projects.html")
-        self.assertContains(response, self.project.title)
-        self.assertContains(response, self.project.highlights[0])
+        self.assertContains(response, 'id="loading"')
+        self.assertContains(response, 'id="empty"')
+        self.assertContains(response, 'id="error"')
+        self.assertNotContains(response, self.project.title)
 
-    def test_empty_projects_page(self):
+    def test_empty_projects_json_returns_empty_array(self):
         Project.objects.all().delete()
-        response = self.client.get(reverse("main:show_projects"))
+        response = self.client.get(reverse("main:get_projects_json"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "projects.html")
-        self.assertContains(response, "No projects have been added yet.")
+        self.assertJSONEqual(response.content, [])
 
     def test_project_creation_authorization(self):
         project_data = {
@@ -256,9 +258,93 @@ class MainTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "awards.html")
-        self.assertContains(response, self.award.title)
-        self.assertContains(response, self.award.description)
+        self.assertContains(response, 'id="loading"')
+        self.assertContains(response, 'id="empty"')
+        self.assertContains(response, 'id="error"')
+        self.assertNotContains(response, self.award.title)
         self.assertContains(response, f'href="{reverse("main:show_experience")}"')
+
+    def test_awards_page_skeleton_is_available_for_every_role(self):
+        roles = [None, self.regular_user, self.editor_user, self.superuser]
+
+        for user in roles:
+            with self.subTest(role=user.username if user else "anonymous"):
+                self.client.logout()
+                if user:
+                    self.client.force_login(user)
+
+                response = self.client.get(reverse("main:show_awards"))
+
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'id="grid"')
+                self.assertContains(response, reverse("main:get_awards_json"))
+                self.assertNotContains(response, self.award.title)
+                if user and user.is_superuser:
+                    self.assertContains(response, 'id="add-award-modal"')
+                else:
+                    self.assertNotContains(response, 'id="add-award-modal"')
+
+    def test_awards_json_is_public_and_includes_per_user_star_state(self):
+        self.award.starred_by.add(self.regular_user)
+        roles = [None, self.regular_user, self.editor_user, self.superuser]
+
+        for user in roles:
+            with self.subTest(role=user.username if user else "anonymous"):
+                self.client.logout()
+                if user:
+                    self.client.force_login(user)
+
+                response = self.client.get(reverse("main:get_awards_json"))
+
+                self.assertEqual(response.status_code, 200)
+                award_json = next(
+                    item for item in response.json() if item["pk"] == str(self.award.pk)
+                )
+                award_data = award_json["fields"]
+                self.assertEqual(award_data["title"], self.award.title)
+                self.assertEqual(award_data["star_count"], 1)
+                self.assertEqual(award_data["is_starred"], user == self.regular_user)
+
+    def test_award_ajax_creation_checks_roles_and_validates_xss_input(self):
+        endpoint = reverse("main:create_awards_ajax")
+        valid_data = {
+            "title": "New Competition Award",
+            "description": "First place",
+            "thumbnail": "",
+        }
+
+        for user in [None, self.regular_user, self.editor_user]:
+            with self.subTest(role=user.username if user else "anonymous"):
+                self.client.logout()
+                if user:
+                    self.client.force_login(user)
+                response = self.client.post(endpoint, valid_data)
+                self.assertEqual(response.status_code, 403)
+
+        self.client.force_login(self.superuser)
+        response = self.client.post(endpoint, valid_data)
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(Award.objects.filter(title=valid_data["title"]).exists())
+
+        invalid_response = self.client.post(
+            endpoint,
+            {**valid_data, "title": '<img src="x" onerror="alert(1)">'},
+        )
+        self.assertEqual(invalid_response.status_code, 400)
+        self.assertIn("title", invalid_response.json()["errors"])
+
+    def test_awards_form_strips_html_from_user_text(self):
+        form = AwardsForm(
+            data={
+                "title": "<b>Competition Winner</b>",
+                "description": "<p>Won the competition</p>",
+                "thumbnail": "",
+            }
+        )
+
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["title"], "Competition Winner")
+        self.assertEqual(form.cleaned_data["description"], "Won the competition")
 
     def test_empty_experience_page(self):
         Experience.objects.all().delete()
