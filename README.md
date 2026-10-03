@@ -92,6 +92,14 @@ Proyek ini adalah website portofolio pribadi berbasis Django yang dikembangkan s
 - **Fitur Interaktif Star**: Relasi `ManyToManyField` `starred_by` pada model `Project` untuk mekanisme satu bintang per pengguna, dilengkapi endpoint `toggle_star` dengan verifikasi CSRF.
 - **Keamanan Data & Integritas API**: Endpoint `/api/projects/` menyajikan data proyek dan agregat `star_count` tanpa membocorkan identitas pengguna yang membintangi proyek.
 
+#### **Tugas 5: AJAX, Debouncing, Modal, Toast, & XSS Protection**
+- Menerapkan pola AJAX Tutorial 05 pada section **Awards**: halaman menampilkan skeleton lalu mengambil data dari `/api/awards/` melalui `fetch()` dan `JsonResponse`.
+- Menampilkan loading, empty, dan error state serta mencari award berdasarkan judul dengan debounce 300 ms.
+- Superuser dapat menambahkan award melalui modal dan Fetch API. Endpoint memvalidasi `AwardsForm`, memeriksa izin di server, menerima CSRF token, dan mengembalikan JSON dengan status yang sesuai. Daftar award diperbarui tanpa reload.
+- Endpoint daftar award tetap dapat dibaca pengunjung anonim dan menyertakan `star_count` serta `is_starred` berdasarkan pengguna yang sedang login.
+- Menampilkan toast sukses dan gagal, termasuk pesan validasi dari server. `AwardsForm` membersihkan judul/deskripsi dengan `strip_tags`; teks dari JSON di-escape dengan `escapeHtml` sebelum dirender.
+- Menambahkan automated tests untuk skeleton halaman, akses JSON tiap role, state Star per pengguna, otorisasi penambahan award, dan pembersihan input.
+
 ---
 
 # 2. Reflective Questions
@@ -138,6 +146,20 @@ Jawab: Saat URL diakses, fungsi view Django akan dipicu untuk mengambil data por
 
 ### Tugas 4
 *(Catatan: Pertanyaan refleksi ditiadakan pada Tugas 4 sesuai instruksi tugas)*
+
+### Tugas 5
+
+1. **Jelaskan apa itu *debouncing* dan mengapa teknik ini penting diterapkan pada fitur pencarian yang menggunakan AJAX!**
+
+   *Debouncing* adalah teknik menunda eksekusi suatu fungsi sampai tidak ada input baru selama jangka waktu tertentu. Pada pencarian Awards, permintaan baru dikirim 300 milidetik setelah pengguna berhenti mengetik. Tanpa debouncing, setiap karakter yang diketik pengguna akan memicu fungsi pencarian. Misal, pengguna mengetik kata "National", maka aplikasi akan mengirimkan 8 permintaan AJAX sekaligus ke server (N, Na, Nat, Nati, Natio, Nation, Nationa, National). Dengan *debouncing*, browser tidak mengirim permintaan untuk setiap huruf yang diketik sehingga beban server berkurang dan hasil pencarian mengikuti kata kunci terbaru.
+
+2. **Jelaskan fungsi dari penggunaan `await` ketika kita menggunakan `fetch()`! Apa yang akan terjadi jika kita tidak menggunakan `await`?**
+
+   `fetch()` bekerja secara asinkron dan mengembalikan sebuah `Promise`. `await` menunggu sampai `Promise` tersebut selesai sehingga kode dapat memeriksa respons dan membaca JSON sebelum menggunakan datanya. Tanpa `await` atau rangkaian `.then()`, kode langsung menerima objek `Promise`, bukan data respons. Akibatnya, kode yang mencoba membaca isi respons dapat berjalan terlalu cepat sebelum data tersedia.
+
+3. **Jelaskan apa itu serangan XSS (*Cross-Site Scripting*) dan mengapa data yang ditampilkan melalui AJAX/JavaScript lebih rentan terhadap serangan ini daripada data yang ditampilkan langsung melalui *template* Django!**
+
+   XSS adalah serangan ketika data yang tidak tepercaya ditafsirkan sebagai HTML atau JavaScript aktif di browser pengguna. Template Django secara otomatis melakukan *escaping* pada variabel secara default. Sebaliknya, data JSON yang dimasukkan ke halaman oleh JavaScript tidak otomatis mendapat perlindungan tersebut, terutama jika dimasukkan menggunakan `innerHTML`. Oleh karena itu, nilai yang ditampilkan melalui JavaScript perlu di-*escape* dengan `escapeHtml` atau ditampilkan memakai `textContent`. Pada proyek ini, teks judul dan deskripsi juga dibersihkan di server dengan `strip_tags` sebagai lapisan tambahan.
 
 ---
 
@@ -191,3 +213,16 @@ Saya menggunakan **Google Antigravity** sebagai bantuan selama mengerjakan tugas
 **Keterbatasan AI yang saya temukan & Analisis Kritis:**
 1. **Pencemaran Data Lokal**: AI sempat mengeksekusi fungsi setup pengujian di shell pada database lokal `db.sqlite3` sehingga memunculkan data duplikat pada Experience dan Awards, yang akhirnya harus saya bersihkan manual melalui query ORM.
 2. **Crash Django Admin di Python 3.14**: Terjadi error `AttributeError` pada `BaseContext.__copy__` karena perubahan standar library Python 3.14. AI awalnya salah mengira bug berasal dari model fields, sehingga perlu investigasi traceback mendalam sebelum akhirnya diperbaiki dengan menambahkan patch adapter di `portofolio/__init__.py`.
+
+### Tugas 5
+Saya menggunakan **OpenAI Codex** sebagai AI coding assistant saat meninjau dan memperbaiki implementasi Assignment 5.
+
+**Bagian yang dibantu AI:**
+1. Membandingkan section Awards, endpoint JSON, form AJAX, hak akses tiap role, dan perlindungan XSS dengan checklist tugas.
+2. Menambahkan toast untuk aksi tambah/hapus award dan Star, lalu memperbarui automated tests agar sesuai dengan alur halaman AJAX dan endpoint JSON.
+3. Membantu perbaikan UI yang diminta selama pengerjaan, termasuk tema gelap/terang, keterbacaan toast/Star, tampilan profil dan navbar.
+4. Menyusun dokumentasi progres serta jawaban refleksi Assignment 5 di README.
+
+**Strategi prompting dan ringkasan riwayat:** Saya memberikan checklist tugas, screenshot atau pesan kegagalan yang relevan, kemudian meminta Codex membandingkan implementasi dengan kebutuhan dan memverifikasi hasilnya. Prompt utama mencakup permintaan audit checklist, penyelesaian bagian yang belum lengkap, dan pembaruan tes agar mengikuti arsitektur AJAX. Riwayat percakapan lengkap tersedia di chat Codex yang digunakan untuk mengerjakan repositori ini.
+
+**Keterbatasan AI yang ditemukan:** Tes awal masih mengharapkan halaman Awards dan Projects merender data langsung di HTML. Codex perlu diarahkan untuk mengubah tes agar memeriksa skeleton dan endpoint JSON. Pemeriksaan otomatis juga tidak menggantikan pemeriksaan visual dan uji interaksi langsung di browser; hasil UI tetap saya tinjau berdasarkan screenshot dan kebutuhan yang saya berikan.
