@@ -100,6 +100,12 @@ Proyek ini adalah website portofolio pribadi berbasis Django yang dikembangkan s
 - Menampilkan toast sukses dan gagal, termasuk pesan validasi dari server. `AwardsForm` membersihkan judul/deskripsi dengan `strip_tags`; teks dari JSON di-escape dengan `escapeHtml` sebelum dirender.
 - Menambahkan automated tests untuk skeleton halaman, akses JSON tiap role, state Star per pengguna, otorisasi penambahan award, dan pembersihan input.
 
+#### **Tutorial 7: Django REST Framework**
+- Menambahkan API Projects berversi di `/api/v1/projects/` dengan serializer, validasi input, dan permission berbasis superuser.
+- Mendukung list/search, detail, create, update, delete, serta toggle star melalui HTTP method REST yang sesuai.
+- Mengalihkan halaman Projects ke API DRF dengan CSRF, debounce search, state loading/error/empty, dan refresh AJAX setelah perubahan.
+- Menambahkan `APITestCase` untuk akses publik, otorisasi, validasi, CRUD, pencarian, dan star.
+
 ---
 
 # 2. Reflective Questions
