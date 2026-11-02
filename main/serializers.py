@@ -21,19 +21,12 @@ class AwardSerializer(serializers.ModelSerializer):
 
     def validate_title(self, value):
         cleaned = strip_tags(value).strip()
-        if cleaned != value.strip() or not cleaned:
-            raise serializers.ValidationError(
-                "Award name must contain visible text without HTML tags."
-            )
+        if not cleaned:
+            raise serializers.ValidationError("Award name cannot be empty.")
         return cleaned
 
     def validate_description(self, value):
-        cleaned = strip_tags(value).strip()
-        if cleaned != value.strip():
-            raise serializers.ValidationError(
-                "Description must not contain HTML tags."
-            )
-        return cleaned
+        return strip_tags(value).strip()
 
     def get_is_starred(self, obj):
         request = self.context.get("request")

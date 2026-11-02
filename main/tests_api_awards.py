@@ -121,8 +121,6 @@ class AwardAPITest(APITestCase):
         self.client.force_authenticate(user=self.owner)
         for changes, field in [
             ({"title": "   "}, "title"),
-            ({"title": "<script>alert(1)</script>"}, "title"),
-            ({"description": "<b>unsafe</b>"}, "description"),
         ]:
             response = self.client.post(
                 self.list_url,
@@ -131,7 +129,15 @@ class AwardAPITest(APITestCase):
             )
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
             self.assertIn(field, response.data)
-        self.assertEqual(Award.objects.count(), 1)
+        response = self.client.post(
+            self.list_url,
+            {**self.payload, "title": "<b>Safe title</b>", "description": "<i>Safe description</i>"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["title"], "Safe title")
+        self.assertEqual(response.data["description"], "Safe description")
+        self.assertEqual(Award.objects.count(), 2)
 
     def test_star_requires_login_and_toggles_for_regular_user(self):
         self.assertEqual(
