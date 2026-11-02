@@ -10,9 +10,12 @@ from rest_framework.decorators import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from main.models import Project
-from main.permissions import IsPortfolioOwnerOrReadOnly
-from main.serializers import ProjectSerializer
+from main.models import Award, Project
+from main.permissions import (
+    IsPortfolioOwnerOrEditorOrReadOnly,
+    IsPortfolioOwnerOrReadOnly,
+)
+from main.serializers import AwardSerializer, ProjectSerializer
 
 
 def _project_or_404(project_id):
@@ -82,3 +85,81 @@ def project_star(request, project_id):
         project.starred_by.add(request.user)
     serializer = ProjectSerializer(project, context={"request": request})
     return Response(serializer.data)
+
+
+def _award_or_404(award_id):
+    if not str(award_id).isdigit():
+        raise Http404
+    return get_object_or_404(
+        Award.objects.prefetch_related("starred_by"), pk=award_id,
+    )
+
+
+@api_view(["GET", "HEAD", "POST"])
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
+def award_list(request):
+    awards = Award.objects.prefetch_related("starred_by").all()
+    title_query = request.query_params.get("title", "").strip()
+    if title_query:
+        awards = awards.filter(title__icontains=title_query)
+
+    if request.method in ("GET", "HEAD"):
+        serializer = AwardSerializer(
+            awards, many=True, context={"request": request},
+        )
+        return Response(serializer.data)
+
+    if not request.user.is_superuser:
+        return Response(
+            {"detail": "Only the portfolio owner can create awards."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+    serializer = AwardSerializer(data=request.data, context={"request": request})
+    serializer.is_valid(raise_exception=True)
+    award = serializer.save()
+    return Response(
+        AwardSerializer(award, context={"request": request}).data,
+        status=status.HTTP_201_CREATED,
+    )
+
+
+@api_view(["GET", "HEAD", "PUT", "PATCH", "DELETE"])
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
+def award_detail(request, award_id):
+    award = _award_or_404(award_id)
+    if request.method in ("GET", "HEAD"):
+        return Response(
+            AwardSerializer(award, context={"request": request}).data,
+        )
+    if request.method == "DELETE":
+        if not request.user.is_superuser:
+            return Response(
+                {"detail": "Only the portfolio owner can delete awards."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        award.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    serializer = AwardSerializer(
+        award,
+        data=request.data,
+        partial=request.method == "PATCH",
+        context={"request": request},
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data)
+
+
+@api_view(["POST"])
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def award_star(request, award_id):
+    award = _award_or_404(award_id)
+    if award.starred_by.filter(pk=request.user.pk).exists():
+        award.starred_by.remove(request.user)
+    else:
+        award.starred_by.add(request.user)
+    return Response(AwardSerializer(award, context={"request": request}).data)

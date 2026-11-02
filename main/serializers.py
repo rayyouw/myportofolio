@@ -1,7 +1,50 @@
 from django.utils.html import strip_tags
 from rest_framework import serializers
 
-from main.models import Project
+from main.models import Award, Project
+
+
+class AwardSerializer(serializers.ModelSerializer):
+    star_count = serializers.IntegerField(source="starred_by.count", read_only=True)
+    is_starred = serializers.SerializerMethodField()
+    starred_by_names = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Award
+        fields = [
+            "id", "title", "description", "thumbnail", "created_at",
+            "star_count", "is_starred", "starred_by_names",
+        ]
+        read_only_fields = [
+            "id", "created_at", "star_count", "is_starred", "starred_by_names",
+        ]
+
+    def validate_title(self, value):
+        cleaned = strip_tags(value).strip()
+        if cleaned != value.strip() or not cleaned:
+            raise serializers.ValidationError(
+                "Award name must contain visible text without HTML tags."
+            )
+        return cleaned
+
+    def validate_description(self, value):
+        cleaned = strip_tags(value).strip()
+        if cleaned != value.strip():
+            raise serializers.ValidationError(
+                "Description must not contain HTML tags."
+            )
+        return cleaned
+
+    def get_is_starred(self, obj):
+        request = self.context.get("request")
+        return bool(
+            request
+            and request.user.is_authenticated
+            and obj.starred_by.filter(pk=request.user.pk).exists()
+        )
+
+    def get_starred_by_names(self, obj):
+        return ", ".join(obj.starred_by.values_list("username", flat=True))
 
 
 class ProjectSerializer(serializers.ModelSerializer):
