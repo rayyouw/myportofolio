@@ -8,9 +8,7 @@
         <section class="awards-section awards-page" id="awards">
             <div class="container">
                 <div class="page-grid">
-                    <div class="page-heading">
-                        <h1>AWARDS</h1>
-                    </div>
+                    <div class="page-heading"><h1>AWARDS</h1></div>
                     <div class="page-content">
                         <div class="project-header">
                             <p class="project-kicker">Pencapaian yang saya raih</p>
@@ -24,23 +22,9 @@
                             <input type="search" id="search-input" name="title" value="{{ title_query }}" placeholder="Cari berdasarkan nama penghargaan" class="project-search__input" aria-label="Cari berdasarkan nama penghargaan">
                             <button type="submit" class="button">Cari</button>
                         </form>
-
-                        <!-- Loading State -->
-                        <div id="loading" class="empty-state hide">
-                            <p>Loading awards...</p>
-                        </div>
-
-                        <!-- Error State -->
-                        <div id="error" class="empty-state hide">
-                            <p>Failed to load award data. Please try again.</p>
-                        </div>
-
-                        <!-- Empty State -->
-                        <div id="empty" class="empty-state hide">
-                            <p>No awards have been added or found yet.</p>
-                        </div>
-
-                        <!-- Awards Grid -->
+                        <div id="loading" class="empty-state hide"><p>Loading awards...</p></div>
+                        <div id="error" class="empty-state hide"><p>Failed to load award data. Please try again.</p></div>
+                        <div id="empty" class="empty-state hide"><p>No awards have been added or found yet.</p></div>
                         <div id="grid" class="awards-list hide"></div>
                     </div>
                 </div>
@@ -52,24 +36,24 @@
         {% include "components/award_form_modal.html" %}
     {% endif %}
 
+    {% csrf_token %}
     <script>
-    // Configuration
-    const BASE_AWARDS_ENDPOINT = "{% url 'main:get_awards_json' %}";
+    const BASE_AWARDS_ENDPOINT = "{% url 'api:award-list' %}";
+    const DETAIL_AWARD_ENDPOINT = "{% url 'api:award-detail' 0 %}";
+    const STAR_AWARD_ENDPOINT = "{% url 'api:award-star' 0 %}";
     const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
-    let awardsAbortController;
-
-    // DOM elements
+    const IS_AUTHENTICATED = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
+    const IS_EDITOR = "{{ is_editor|yesno:'true,false' }}" === "true";
     const loadingState = document.getElementById('loading');
     const errorState = document.getElementById('error');
     const emptyState = document.getElementById('empty');
     const gridContainer = document.getElementById('grid');
     const searchForm = document.getElementById('award-search-form');
     const searchInput = document.getElementById('search-input');
-
-    const SEARCH_DEBOUNCE_DELAY = 300;
+    const awardForm = document.getElementById('award-form');
+    let awardsAbortController;
     let searchDebounceTimer;
 
-    // Show/hide page sections
     function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
         loadingState.classList.toggle('hide', !showLoading);
         errorState.classList.toggle('hide', !showError);
@@ -77,119 +61,88 @@
         gridContainer.classList.toggle('hide', !showGrid);
     }
 
-    // Build an award card element
-    function buildAwardCardElement(item) {
-        const award = item.fields;
-        const awardId = item.pk;
+    function awardEndpoint(pattern, awardId) {
+        return pattern.replace('/0/', `/${awardId}/`);
+    }
 
-        const articleElement = document.createElement('article');
-        articleElement.className = 'awards-item';
+    function apiErrorMessage(result, statusCode) {
+        if (result && result.detail) return result.detail;
+        if (result && typeof result === 'object') {
+            const messages = Object.values(result).flat().map(item =>
+                typeof item === 'string' ? item : item.message
+            ).filter(Boolean);
+            if (messages.length) return messages.join(' ');
+        }
+        return `Request failed (status ${statusCode}).`;
+    }
 
+    async function writeAward(url, method, payload) {
+        const options = {
+            method,
+            headers: {
+                Accept: 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        };
+        if (payload !== undefined) {
+            options.headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(payload);
+        }
+        const response = await fetch(url, options);
+        const result = response.status === 204 ? null : await response.json();
+        if (!response.ok) throw new Error(apiErrorMessage(result, response.status));
+        return result;
+    }
+
+    function buildAwardCardElement(award) {
+        const article = document.createElement('article');
+        article.className = 'awards-item';
         const imageHtml = award.thumbnail
             ? `<img class="item-icon" src="${escapeHtml(award.thumbnail)}" alt="${escapeHtml(award.title)} logo">`
             : '';
-
-        // Build delete and star URLs by replacing a placeholder ID
-        const deleteUrl = "{% url 'main:delete_awards' 0 %}"
-            .replace('0', awardId);
-
-        const starUrl = "{% url 'main:toggle_star_award' 0 %}"
-            .replace('0', awardId);
-
-        const deleteHtml = IS_SUPERUSER
-            ? `<form id="delete-award-form-${awardId}" method="post" action="${deleteUrl}" data-loading-title="Processing" data-loading-message="Deleting award...">
-                    {% csrf_token %}
-                    <button type="submit" class="button button-danger"
-                            onclick="return confirm('Apakah Anda yakin ingin menghapus award ini?');">Hapus</button>
-               </form>`
+        const starHtml = IS_AUTHENTICATED
+            ? `<button type="button" class="button button-star${award.is_starred ? ' is-starred' : ''}" data-action="star" data-id="${award.id}">
+                <span aria-hidden="true">★</span> ${award.is_starred ? 'Unstar' : 'Star'}
+                <span class="star-count">${award.star_count}</span>
+               </button>`
+            : `<a href="{% url 'main:login' %}?next={% url 'main:show_awards' %}" class="button button-star">
+                <span aria-hidden="true">★</span> Star <span class="star-count">${award.star_count}</span>
+               </a>`;
+        const editHtml = IS_SUPERUSER || IS_EDITOR
+            ? `<a href="/awards/${award.id}/edit/" class="button button-secondary">Edit Award</a>`
             : '';
-
-        const isStarredClass = award.is_starred ? " is-starred" : "";
-        const starText = award.is_starred ? "Unstar" : "Star";
-        const starTitle = award.star_count > 0
-            ? `Starred by ${escapeHtml(award.starred_by_names)}`
-            : "Be the first to star";
-
-        // Edit button for editors or superuser
-        const isEditor = "{{ is_editor|yesno:'true,false' }}" === "true";
-        let editDeleteActions = '';
-        if (IS_SUPERUSER || isEditor) {
-            const editBtn = `<a href="/awards/${awardId}/edit/" class="button button-secondary">Edit Award</a>`;
-            editDeleteActions = `
-                <div class="project-actions">
-                    ${editBtn}
-                    ${deleteHtml}
-                </div>
-            `;
-        }
-
-        const authStarHtml = `
-            {% if user.is_authenticated %}
-                <form method="post" action="${starUrl}" class="star-form" data-loading-title="Processing" data-loading-message="${award.is_starred ? 'Removing star...' : 'Adding star...'}">
-                    {% csrf_token %}
-                    <button type="submit" class="button button-star${isStarredClass}" title="${starTitle}">
-                        <span aria-hidden="true">★</span>
-                        ${starText}
-                        <span class="star-count">${award.star_count}</span>
-                    </button>
-                </form>
-            {% else %}
-                <a href="{% url 'main:login' %}?next={% url 'main:show_awards' %}" class="button button-star" title="Login to star this award">
-                    <span aria-hidden="true">★</span> Star
-                    <span class="star-count">${award.star_count}</span>
-                </a>
-            {% endif %}
-        `;
-
-        // Card component
-        const completeCardHtml = `
-            <div class="item-row">
-                ${imageHtml}
-                <div class="item-text">
-                    <h3>${escapeHtml(award.title)}</h3>
-                </div>
-            </div>
+        const deleteHtml = IS_SUPERUSER
+            ? `<button type="button" class="button button-danger" data-action="delete" data-id="${award.id}">Hapus</button>`
+            : '';
+        article.innerHTML = `
+            <div class="item-row">${imageHtml}<div class="item-text"><h3>${escapeHtml(award.title)}</h3></div></div>
             <p>${escapeHtml(award.description)}</p>
             <div class="project-actions" style="margin-top: 1rem; border-top: 1px solid var(--line); padding-top: 1rem;">
-                ${authStarHtml}
-            </div>
-            ${editDeleteActions}
-        `;
-
-        articleElement.innerHTML = completeCardHtml;
-        return articleElement;
+                ${starHtml}${editHtml}${deleteHtml}
+            </div>`;
+        return article;
     }
 
-    // Fetch award data
-    async function fetchAwards(searchQuery = "") {
+    async function fetchAwards(searchQuery = '') {
         if (awardsAbortController) awardsAbortController.abort();
         awardsAbortController = new AbortController();
-
+        displayPageSection({ showLoading: true });
+        const url = searchQuery
+            ? `${BASE_AWARDS_ENDPOINT}?title=${encodeURIComponent(searchQuery)}`
+            : BASE_AWARDS_ENDPOINT;
         try {
-            displayPageSection({ showLoading: true });
-
-            const url = searchQuery
-                ? `${BASE_AWARDS_ENDPOINT}?title=${encodeURIComponent(searchQuery)}`
-                : BASE_AWARDS_ENDPOINT;
-
             const response = await fetch(url, {
-                headers: { 'Accept': 'application/json' },
+                headers: { Accept: 'application/json' },
                 signal: awardsAbortController.signal,
             });
-
-            if (!response.ok) throw new Error('Failed to fetch data');
-
-            const awardData = await response.json();
-
-            if (awardData.length === 0) {
+            const result = await response.json();
+            if (!response.ok) throw new Error(apiErrorMessage(result, response.status));
+            if (!result.length) {
                 displayPageSection({ showEmpty: true });
-            } else {
-                gridContainer.innerHTML = '';
-                awardData.forEach(item => {
-                    gridContainer.appendChild(buildAwardCardElement(item));
-                });
-                displayPageSection({ showGrid: true });
+                return;
             }
+            gridContainer.replaceChildren(...result.map(buildAwardCardElement));
+            displayPageSection({ showGrid: true });
         } catch (error) {
             if (error.name === 'AbortError') return;
             console.error('Error loading awards:', error);
@@ -197,74 +150,58 @@
         }
     }
 
-    // Close the add-award modal
-    function closeAwardModal() {
-        document.getElementById("add-award-modal").hidePopover();
-    }
-
-    // AJAX Add Award
-    const CREATE_AWARD_ENDPOINT = "{% url 'main:create_awards_ajax' %}";
-    const awardForm = document.getElementById('award-form');
-
-    // Send the form data to the server
-    async function addAward(event) {
-        event.preventDefault();
-
-        const submitButton = awardForm.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        showToast('Processing', 'Adding award...', 'normal', 30000);
-
-        try {
-            const response = await fetch(CREATE_AWARD_ENDPOINT, {
-                method: 'POST',
-                headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                body: new FormData(awardForm),
-            });
-
-            const result = await response.json().catch(() => ({}));
-
-            if (response.ok) {
-                awardForm.reset();
-                closeAwardModal();
-                showToast('Success', 'New award added successfully!', 'success');
-                fetchAwards(searchInput.value.trim());
-            } else {
-                const errorMessages = result.errors
-                    ? Object.values(result.errors).flat().map(error => error.message)
-                    : [result.message || `Something went wrong (status ${response.status}).`];
-                showToast('Failed to add award', errorMessages.join(' '), 'error');
-            }
-        } catch (error) {
-            console.error('Error adding award:', error);
-            showToast('Failed to add award', 'Could not reach the server. Please try again.', 'error');
-        } finally {
-            submitButton.disabled = false;
-        }
-    }
-
     if (awardForm) {
-        awardForm.addEventListener('submit', addAward);
+        awardForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const button = awardForm.querySelector('button[type="submit"]');
+            button.disabled = true;
+            try {
+                const fields = new FormData(awardForm);
+                await writeAward(BASE_AWARDS_ENDPOINT, 'POST', {
+                    title: fields.get('title'),
+                    description: fields.get('description'),
+                    thumbnail: fields.get('thumbnail'),
+                });
+                awardForm.reset();
+                document.getElementById('add-award-modal').hidePopover();
+                showToast('Success', 'New award added successfully!', 'success');
+                await fetchAwards(searchInput.value.trim());
+            } catch (error) {
+                showToast('Failed to add award', error.message, 'error');
+            } finally {
+                button.disabled = false;
+            }
+        });
     }
 
-    // Search with debouncing
-    function searchAwards() {
-        fetchAwards(searchInput.value.trim());
-    }
-
-    searchInput.addEventListener("input", function() {
-        clearTimeout(searchDebounceTimer);
-        searchDebounceTimer = setTimeout(function() {
-            searchAwards();
-        }, SEARCH_DEBOUNCE_DELAY);
+    gridContainer.addEventListener('click', async event => {
+        const button = event.target.closest('button[data-action]');
+        if (!button || button.disabled) return;
+        if (button.dataset.action === 'delete' && !window.confirm('Delete this award?')) return;
+        button.disabled = true;
+        try {
+            const pattern = button.dataset.action === 'star'
+                ? STAR_AWARD_ENDPOINT
+                : DETAIL_AWARD_ENDPOINT;
+            await writeAward(awardEndpoint(pattern, button.dataset.id), button.dataset.action === 'star' ? 'POST' : 'DELETE');
+            showToast('Success', button.dataset.action === 'star' ? 'Star updated.' : 'Award deleted.', 'success');
+            await fetchAwards(searchInput.value.trim());
+        } catch (error) {
+            showToast('Request failed', error.message, 'error');
+        } finally {
+            button.disabled = false;
+        }
     });
 
-    searchForm.addEventListener("submit", function(event) {
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => fetchAwards(searchInput.value.trim()), 300);
+    });
+    searchForm.addEventListener('submit', event => {
         event.preventDefault();
         clearTimeout(searchDebounceTimer);
-        searchAwards();
+        fetchAwards(searchInput.value.trim());
     });
-
-    // Start the application
     fetchAwards(searchInput.value.trim());
     </script>
 {% endblock content %}

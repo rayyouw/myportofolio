@@ -277,7 +277,7 @@ class MainTest(TestCase):
 
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, 'id="grid"')
-                self.assertContains(response, reverse("main:get_awards_json"))
+                self.assertContains(response, reverse("api:award-list"))
                 self.assertNotContains(response, self.award.title)
                 if user and user.is_superuser:
                     self.assertContains(response, 'id="add-award-modal"')
