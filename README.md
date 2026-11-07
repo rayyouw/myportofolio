@@ -106,6 +106,14 @@ Proyek ini adalah website portofolio pribadi berbasis Django yang dikembangkan s
 - Mengalihkan halaman Projects ke API DRF dengan CSRF, debounce search, state loading/error/empty, dan refresh AJAX setelah perubahan.
 - Menambahkan `APITestCase` untuk akses publik, otorisasi, validasi, CRUD, pencarian, dan star.
 
+#### **Tugas 6: Django REST Framework Implementation (Awards Section)**
+- Mengimplementasikan `AwardSerializer` (`ModelSerializer`) dengan daftar `fields` eksplisit, validasi sanitasi teks via `strip_tags` pada `validate_title` dan `validate_description`, serta read-only computed fields (`star_count`, `is_starred`, `starred_by_names`).
+- Menerapkan permission class `IsPortfolioOwnerOrEditorOrReadOnly` pada endpoint koleksi dan detail Awards di `/api/v1/awards/`, yang menegakkan hak akses 4 peran (Visitor, Regular User, Editor, Owner) di tingkat permission sebelum request mencapai badan view.
+- Menyediakan endpoint function-based API view dengan decorator `@api_view`, `SessionAuthentication`, dan HTTP status codes yang sesuai: 200 OK, 201 Created, 204 No Content, 400 Bad Request, 403 Forbidden, 404 Not Found, dan 405 Method Not Allowed.
+- Mengintegrasikan antarmuka Awards (`awards.html`) dengan Fetch API ke endpoint DRF `/api/v1/awards/`: loading/empty/error states, debounce search 300 ms, modal tambah untuk superuser, tombol toggle star dinamis untuk pengguna login, penghapusan data untuk superuser, serta modal edit in-place dan halaman edit untuk Editor dan Superuser tanpa reload halaman.
+- Menampilkan toast notifikasi untuk keberhasilan aksi maupun penanganan galat API (400 validation error & 403 authorization error), serta memastikan header `X-CSRFToken` dikirim pada setiap mutasi data.
+- Menulis rangkaian pengujian otomatis `AwardAPITest` (`APITestCase`) mencakup 11 test methods yang memvalidasi otorisasi 4 peran, verifikasi jumlah & kondisi data di database, pengujian validasi & sanitasi input, fitur star, computed fields, dan pengujian proteksi CSRF menggunakan `enforce_csrf_checks=True`.
+
 ---
 
 # 2. Reflective Questions
@@ -166,6 +174,47 @@ Jawab: Saat URL diakses, fungsi view Django akan dipicu untuk mengambil data por
 3. **Jelaskan apa itu serangan XSS (*Cross-Site Scripting*) dan mengapa data yang ditampilkan melalui AJAX/JavaScript lebih rentan terhadap serangan ini daripada data yang ditampilkan langsung melalui *template* Django!**
 
    XSS adalah serangan ketika data yang tidak tepercaya ditafsirkan sebagai HTML atau JavaScript aktif di browser pengguna. Template Django secara otomatis melakukan *escaping* pada variabel secara default. Sebaliknya, data JSON yang dimasukkan ke halaman oleh JavaScript tidak otomatis mendapat perlindungan tersebut, terutama jika dimasukkan menggunakan `innerHTML`. Oleh karena itu, nilai yang ditampilkan melalui JavaScript perlu di-*escape* dengan `escapeHtml` atau ditampilkan memakai `textContent`. Pada proyek ini, teks judul dan deskripsi juga dibersihkan di server dengan `strip_tags` sebagai lapisan tambahan.
+
+### Assignment 6
+
+1. **Jelaskan apa arti REST dan mengapa mengembalikan JSON saja tidak cukup untuk menyebut suatu API bersifat RESTful! Jelaskan juga perbedaan antara PUT dan PATCH beserta contoh kapan masing-masing harus digunakan!**
+
+   REST (*Representational State Transfer*) adalah gaya arsitektur (*architectural style*) untuk merancang web API yang berpusat pada konsep **resource**. Mengembalikan data berformat JSON saja belum tentu membuat API tersebut RESTful karena REST menuntut prinsip-prinsip arsitektural tertentu, antara lain:
+   - **Resource-based URIs**: Setiap data/kumpulan data diidentifikasi melalui URI yang menunjuk ke *resource* (kata benda), seperti `/api/v1/awards/` untuk koleksi dan `/api/v1/awards/1/` untuk entri tunggal, bukan berupa aksi (seperti `/create-award/` atau `/delete-award/`).
+   - **Penggunaan HTTP Method yang Semantik**: Aksi ditentukan oleh metode HTTP (`GET` untuk membaca, `POST` untuk membuat baru, `PUT`/`PATCH` untuk memperbarui, dan `DELETE` untuk menghapus), bukan diletakkan pada nama URL.
+   - **Pertukaran Representasi Data**: Klien dan server bertukar representasi data (seperti JSON), bukan objek internal bahasa pemrograman atau baris database mentah.
+   - **Stateless**: Setiap permintaan membawa seluruh informasi dan kredensial yang dibutuhkan server tanpa bergantung pada penyimpanan status sesi di server (*session state*) untuk mengetahui konteks permintaan sebelumnya.
+
+   **Perbedaan PUT dan PATCH:**
+   - **PUT** bersifat penggantian penuh (*full replacement/update*). Klien mengirimkan representasi lengkap dari resource termasuk seluruh *field* wajib. Jika ada *field* opsional yang diabaikan, nilainya dapat di-reset atau dikosongkan sesuai definisi serializer. Contoh penggunaan: Ketika pengguna ingin memperbarui seluruh entri award secara menyeluruh melalui form komprehensif yang memuat `title`, `description`, dan `thumbnail`.
+   - **PATCH** bersifat pembaruan parsial (*partial update*). Klien hanya mengirimkan *field* spesifik yang ingin diubah tanpa harus menyertakan *field* lainnya (`partial=True` pada DRF). Contoh penggunaan: Mengubah hanya judul award (`title`) tanpa perlu menyertakan kembali nilai `description` dan `thumbnail` yang sudah ada sebelumnya.
+
+2. **Jelaskan peran *serializer* pada Django REST Framework! Apa kelebihannya dibandingkan menyusun dictionary secara manual dengan `JsonResponse` seperti pada Tutorial 05?**
+
+   *Serializer* dalam Django REST Framework bertindak sebagai jembatan dua arah (*two-way transformer*) antara tipe data kompleks Django (seperti QuerySet dan model instances) dengan format data standar yang dapat dirender ke JSON/XML (dan sebaliknya).
+   - **Serialization (Read/Outgoing)**: Mengonversi objek model Django ke dalam tipe data Python primitif (`dict`, `list`) yang kemudian dirender menjadi respons JSON oleh DRF.
+   - **Deserialization & Validation (Write/Incoming)**: Menerima data masukan mentah dari request klien (`request.data`), memvalidasi tipe data, batas panjang, keunikan, hingga sanitasi teks kustom (`validate_<field>`), lalu menyimpan instance ke database melalui metode `.save()`.
+
+   **Kelebihan Serializer dibanding `JsonResponse` manual (Tutorial 05):**
+   - **Otomatisasi & Konsistensi Validasi**: Serializer menyediakan validasi bawaan berbasis model skema (`ModelSerializer`) serta validasi per-field yang terpusat dan konsisten, mengembalikan pesan galat terstruktur standar `{field: [errors]}` secara otomatis via `is_valid(raise_exception=True)`.
+   - **Dua Arah (Deserialisasi & Serialisasi)**: Pada Tutorial 05, kita harus menyusun dictionary satu per satu saat membaca data, dan memvalidasi form secara terpisah saat menulis data. Serializer menyatukan kontrak data baca dan tulis dalam satu kelas deklaratif.
+   - **Dukungan Computed Fields & Relasi**: Memudahkan kalkulasi nilai dinamis (seperti `SerializerMethodField` untuk `star_count` dan `is_starred`) dan menangani relasi antar-model secara efisien dengan context request.
+   - **Content Negotiation & Browsable API**: Serializer menghasilkan Python native data yang kompatibel dengan berbagai renderer DRF (JSON, Browsable API HTML form) tanpa perlu `json.dumps()` manual.
+
+3. **Jelaskan perbedaan antara autentikasi (*authentication*) dan otorisasi (*authorization*) pada Django REST Framework! Mengapa hak akses harus diperiksa dengan *permission class* di server, bukan hanya dengan menyembunyikan tombol pada template?**
+
+   - **Autentikasi (*Authentication*)**: Menjawab pertanyaan *"Siapa Anda?"* (*Who are you?*). DRF menggunakan *authentication class* (seperti `SessionAuthentication`) untuk mengidentifikasi pengguna yang mengirimkan request berdasarkan kredensial (misalnya session cookie). Hasilnya adalah menetapkan `request.user` menjadi pengguna terdaftar atau `AnonymousUser`.
+   - **Otorisasi (*Authorization*)**: Menjawab pertanyaan *"Apakah Anda diizinkan melakukan tindakan ini?"* (*What are you allowed to do?*). DRF menggunakan *permission class* (seperti `IsPortfolioOwnerOrEditorOrReadOnly` atau `IsAuthenticated`) untuk mengevaluasi apakah `request.user` memiliki hak untuk menjalankan aksi pada metode HTTP dan resource yang diminta.
+
+   **Mengapa hak akses harus diperiksa di server via *permission class*?**
+   Menyembunyikan tombol di template HTML hanyalah optimasi antarmuka (UI/UX) untuk kenyamanan visual pengguna awam. Klien atau penyerang dapat dengan mudah mem-bypass tampilan UI dengan mengirimkan HTTP request langsung (melalui DevTools Console, `fetch()`, `cURL`, atau Postman) ke URL endpoint (misalnya mengirim request `DELETE` atau `POST`). Tanpa *permission class* di sisi server, server akan mengeksekusi aksi terlarang tersebut. Oleh karena itu, server adalah pemegang otoritas tunggal atas keamanan data (*single source of truth*) yang mutlak harus memvalidasi setiap hak akses request.
+
+4. **Jelaskan mengapa permintaan yang mengubah data tetap membutuhkan token CSRF ketika API menggunakan `SessionAuthentication`! Mengapa pengujian menggunakan `force_authenticate` tidak cukup untuk membuktikan bahwa perlindungan CSRF bekerja?**
+
+   Ketika API menggunakan `SessionAuthentication`, browser secara otomatis melampirkan cookie sesi (`sessionid`) ke setiap HTTP request yang ditujukan ke domain server yang sama (*same-origin*). Hal ini membuka celah serangan **CSRF (*Cross-Site Request Forgery*)**, di mana situs pihak ketiga yang berbahaya dapat memperdaya browser pengguna yang sedang login untuk mengirimkan request mutasi data (misalnya `POST /api/v1/awards/`) tanpa disadari pengguna. Untuk menangkalnya, Django dan DRF mewajibkan header `X-CSRFToken` pada setiap request yang memodifikasi data (POST, PUT, PATCH, DELETE), memastikan request benar-benar berasal dari aplikasi resmi dan bukan pihak ketiga.
+
+   **Mengapa `force_authenticate` tidak cukup?**
+   `force_authenticate()` pada DRF test client adalah jalan pintas pengujian hak akses (*authorization bypass helper*) yang secara langsung mengaitkan objek pengguna ke `request.user` tanpa melewati middleware autentikasi Django, tanpa membuat cookie sesi nyata, dan **secara sengaja mengabaikan pemeriksaan CSRF**. Pengujian dengan `force_authenticate` hanya menguji apakah logika izin (*permission*) bekerja ketika identitas pengguna diketahui. Untuk menguji bahwa pertahanan CSRF benar-benar aktif dan menolak request manipulasi data tanpa token, kita harus menggunakan `APIClient(enforce_csrf_checks=True)` bersama metode `.login()`, yang menjalankan alur sesi nyata dan `CsrfViewMiddleware`.
 
 ---
 
@@ -232,3 +281,19 @@ Saya menggunakan **OpenAI Codex** sebagai AI coding assistant saat meninjau dan 
 **Strategi prompting dan ringkasan riwayat:** Saya memberikan checklist tugas, screenshot atau pesan kegagalan yang relevan, kemudian meminta Codex membandingkan implementasi dengan kebutuhan dan memverifikasi hasilnya. Prompt utama mencakup permintaan audit checklist, penyelesaian bagian yang belum lengkap, dan pembaruan tes agar mengikuti arsitektur AJAX. Riwayat percakapan lengkap tersedia di chat Codex yang digunakan untuk mengerjakan repositori ini.
 
 **Keterbatasan AI yang ditemukan:** Tes awal masih mengharapkan halaman Awards dan Projects merender data langsung di HTML. Codex perlu diarahkan untuk mengubah tes agar memeriksa skeleton dan endpoint JSON. Pemeriksaan otomatis juga tidak menggantikan pemeriksaan visual dan uji interaksi langsung di browser; hasil UI tetap saya tinjau berdasarkan screenshot dan kebutuhan yang saya berikan.
+
+### Tugas 6
+Saya menggunakan **Google Antigravity (Gemini 2.5 Flash / High Thinking)** sebagai AI coding assistant untuk mengimplementasikan Tutorial 07 dan Tugas 6, dengan rincian sebagai berikut:
+
+**Bagian yang dibantu AI:**
+1. Membantu perancangan kelas permission deklaratif `IsPortfolioOwnerOrEditorOrReadOnly` di `main/permissions.py` yang memisahkan otorisasi 4 peran (Visitor, Regular User, Editor, Owner/Superuser) langsung pada tahap *permission check* sebelum masuk ke view body.
+2. Membantu penyusunan unit test komprehensif pada `main/tests_api.py` (13 tests sesuai spesifikasi Tutorial 07) dan `main/tests_api_awards.py` (11 tests mencakup pengujian role, database state verification, validasi sanitasi `strip_tags`, read-only computed fields, dan pengujian CSRF dengan `enforce_csrf_checks=True`).
+3. Mengintegrasikan modal edit interaktif in-place (`edit-award-modal`) dan event delegation pada `templates/awards.html` serta menambahkan routing `api-auth/` untuk Browsable API login.
+4. Menyusun jawaban pertanyaan refleksi Tugas 6 dan dokumentasi progres mingguan.
+
+**Strategi prompting:** Memberikan instruksi spesifik berdasarkan silabus resmi PBP Fasilkom UI (Tutorial 07 dan Individual Assignment 6), mencantumkan checklist kriteria penilaian (rubrik 4/4), serta memvalidasi setiap tahapan dengan menjalankan `python manage.py test main`.
+
+**Keterbatasan AI yang ditemukan & Analisis Kritis:**
+1. **Deteksi Versi DRF**: Pada spesifikasi tutorial disebutkan `djangorestframework~=3.18.3`, namun AI mengidentifikasi bahwa rilis DRF di PyPI untuk kompatibilitas Django 4.2 LTS adalah seri 3.15.x. Memaksakan 3.18.3 akan merusak dependensi deployment PWS yang menggunakan Django 4.2, sehingga dilakukan mitigasi mempertahankan `djangorestframework>=3.14,<3.16` di `requirements.txt`.
+2. **Pemisahan Logika Otorisasi**: Implementasi awal sempat meletakkan pengecekan `if not request.user.is_superuser` di dalam badan view fungsi `award_list` dan `award_detail`. Hal ini menyalahi kriteria kode bersih DRF (rubrik code quality 3.5-4.0). AI kemudian diarahkan untuk memindahkan seluruh aturan hak akses role Editor dan Owner ke dalam `has_permission()` pada kelas permission `IsPortfolioOwnerOrEditorOrReadOnly`, sehingga view body tetap murni hanya menangani serialisasi dan respons.
+
