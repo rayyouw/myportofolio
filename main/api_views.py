@@ -30,7 +30,7 @@ def _project_or_404(project_id):
 @authentication_classes([SessionAuthentication])
 @permission_classes([IsPortfolioOwnerOrReadOnly])
 def project_list(request):
-    projects = Project.objects.prefetch_related("starred_by").all()
+    projects = Project.objects.prefetch_related("starred_by").order_by("title", "id")
     title_query = request.query_params.get("title", "").strip()
     if title_query:
         projects = projects.filter(title__icontains=title_query)
@@ -43,11 +43,8 @@ def project_list(request):
 
     serializer = ProjectSerializer(data=request.data, context={"request": request})
     serializer.is_valid(raise_exception=True)
-    project = serializer.save()
-    return Response(
-        ProjectSerializer(project, context={"request": request}).data,
-        status=status.HTTP_201_CREATED,
-    )
+    serializer.save()
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(["GET", "HEAD", "PUT", "PATCH", "DELETE"])
@@ -99,7 +96,7 @@ def _award_or_404(award_id):
 @authentication_classes([SessionAuthentication])
 @permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
 def award_list(request):
-    awards = Award.objects.prefetch_related("starred_by").all()
+    awards = Award.objects.prefetch_related("starred_by").order_by("-created_at", "id")
     title_query = request.query_params.get("title", "").strip()
     if title_query:
         awards = awards.filter(title__icontains=title_query)
@@ -110,11 +107,6 @@ def award_list(request):
         )
         return Response(serializer.data)
 
-    if not request.user.is_superuser:
-        return Response(
-            {"detail": "Only the portfolio owner can create awards."},
-            status=status.HTTP_403_FORBIDDEN,
-        )
     serializer = AwardSerializer(data=request.data, context={"request": request})
     serializer.is_valid(raise_exception=True)
     award = serializer.save()
@@ -133,12 +125,8 @@ def award_detail(request, award_id):
         return Response(
             AwardSerializer(award, context={"request": request}).data,
         )
+
     if request.method == "DELETE":
-        if not request.user.is_superuser:
-            return Response(
-                {"detail": "Only the portfolio owner can delete awards."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
         award.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
