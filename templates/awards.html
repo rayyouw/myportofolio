@@ -36,6 +36,10 @@
         {% include "components/award_form_modal.html" %}
     {% endif %}
 
+    {% if user.is_superuser or is_editor %}
+        {% include "components/award_edit_modal.html" %}
+    {% endif %}
+
     {% csrf_token %}
     <script>
     const BASE_AWARDS_ENDPOINT = "{% url 'api:award-list' %}";
@@ -51,6 +55,7 @@
     const searchForm = document.getElementById('award-search-form');
     const searchInput = document.getElementById('search-input');
     const awardForm = document.getElementById('award-form');
+    const awardEditModalForm = document.getElementById('award-edit-modal-form');
     let awardsAbortController;
     let searchDebounceTimer;
 
@@ -108,8 +113,8 @@
             : `<a href="{% url 'main:login' %}?next={% url 'main:show_awards' %}" class="button button-star">
                 <span aria-hidden="true">★</span> Star <span class="star-count">${award.star_count}</span>
                </a>`;
-        const editHtml = IS_SUPERUSER || IS_EDITOR
-            ? `<a href="/awards/${award.id}/edit/" class="button button-secondary">Edit Award</a>`
+        const editHtml = (IS_SUPERUSER || IS_EDITOR)
+            ? `<button type="button" class="button button-secondary" data-action="edit" data-id="${award.id}" data-title="${escapeHtml(award.title)}" data-description="${escapeHtml(award.description)}" data-thumbnail="${escapeHtml(award.thumbnail || '')}">Edit Award</button>`
             : '';
         const deleteHtml = IS_SUPERUSER
             ? `<button type="button" class="button button-danger" data-action="delete" data-id="${award.id}">Hapus</button>`
@@ -174,9 +179,48 @@
         });
     }
 
+    if (awardEditModalForm) {
+        awardEditModalForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const button = awardEditModalForm.querySelector('button[type="submit"]');
+            button.disabled = true;
+            try {
+                const awardId = document.getElementById('edit-award-id').value;
+                const fields = new FormData(awardEditModalForm);
+                await writeAward(awardEndpoint(DETAIL_AWARD_ENDPOINT, awardId), 'PATCH', {
+                    title: fields.get('title'),
+                    description: fields.get('description'),
+                    thumbnail: fields.get('thumbnail'),
+                });
+                document.getElementById('edit-award-modal').hidePopover();
+                showToast('Success', 'Award berhasil diperbarui!', 'success');
+                await fetchAwards(searchInput.value.trim());
+            } catch (error) {
+                showToast('Update failed', error.message, 'error');
+            } finally {
+                button.disabled = false;
+            }
+        });
+    }
+
     gridContainer.addEventListener('click', async event => {
         const button = event.target.closest('button[data-action]');
         if (!button || button.disabled) return;
+
+        if (button.dataset.action === 'edit') {
+            const editModal = document.getElementById('edit-award-modal');
+            if (editModal) {
+                document.getElementById('edit-award-id').value = button.dataset.id;
+                document.getElementById('edit-award-title').value = button.dataset.title;
+                document.getElementById('edit-award-description').value = button.dataset.description;
+                document.getElementById('edit-award-thumbnail').value = button.dataset.thumbnail || '';
+                editModal.showPopover();
+            } else {
+                window.location.href = `/awards/${button.dataset.id}/edit/`;
+            }
+            return;
+        }
+
         if (button.dataset.action === 'delete' && !window.confirm('Delete this award?')) return;
         button.disabled = true;
         try {

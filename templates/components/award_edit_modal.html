@@ -1,0 +1,27 @@
+<div id="edit-award-modal" class="project-form-modal" popover="auto" role="dialog" aria-modal="true" aria-labelledby="edit-award-modal-title">
+    <button type="button" class="project-form-modal__backdrop" popovertarget="edit-award-modal" popovertargetaction="hide" aria-label="Tutup modal edit award"></button>
+    <div class="project-form-modal__content">
+        <button type="button" class="project-form-modal__close" popovertarget="edit-award-modal" popovertargetaction="hide" aria-label="Tutup modal edit award">&times;</button>
+        <h2 id="edit-award-modal-title">Edit Award</h2>
+        <form id="award-edit-modal-form" class="project-form">
+            {% csrf_token %}
+            <input type="hidden" id="edit-award-id" name="id">
+            <div class="form-group">
+                <label for="edit-award-title">Nama Award</label>
+                <input type="text" id="edit-award-title" name="title" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-award-description">Deskripsi</label>
+                <textarea id="edit-award-description" name="description" class="form-control" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="edit-award-thumbnail">URL Thumbnail (Opsional)</label>
+                <input type="url" id="edit-award-thumbnail" name="thumbnail" class="form-control" placeholder="https://example.com/image.png">
+            </div>
+            <div class="project-form-modal__actions">
+                <button type="button" class="button button-secondary" popovertarget="edit-award-modal" popovertargetaction="hide">Batal</button>
+                <button type="submit" class="button">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
