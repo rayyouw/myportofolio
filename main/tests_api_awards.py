@@ -23,10 +23,12 @@ class AwardAPITest(APITestCase):
         )
         editor_group = Group.objects.create(name="Editor")
         self.editor.groups.add(editor_group)
+
         Award.objects.all().delete()
         self.award = Award.objects.create(
             title="Portfolio Award",
             description="A competition result",
+            thumbnail="https://example.com/initial.png",
         )
         self.list_url = reverse("api:award-list")
         self.detail_url = reverse("api:award-detail", args=[self.award.pk])
@@ -68,6 +70,12 @@ class AwardAPITest(APITestCase):
                 status.HTTP_403_FORBIDDEN,
             )
             self.assertEqual(
+                self.client.put(
+                    self.detail_url, self.payload, format="json",
+                ).status_code,
+                status.HTTP_403_FORBIDDEN,
+            )
+            self.assertEqual(
                 self.client.patch(
                     self.detail_url, {"title": "Changed"}, format="json",
                 ).status_code,
@@ -81,8 +89,10 @@ class AwardAPITest(APITestCase):
         self.award.refresh_from_db()
         self.assertEqual(self.award.title, "Portfolio Award")
 
-    def test_editor_can_patch_but_cannot_create_or_delete(self):
+    def test_editor_can_put_and_patch_but_cannot_create_or_delete(self):
         self.client.force_authenticate(user=self.editor)
+
+        # Editor can PATCH
         response = self.client.patch(
             self.detail_url, {"title": "Edited Award"}, format="json",
         )
@@ -90,10 +100,25 @@ class AwardAPITest(APITestCase):
         self.award.refresh_from_db()
         self.assertEqual(self.award.title, "Edited Award")
 
+        # Editor can PUT
+        put_payload = {
+            "title": "Fully Updated Award",
+            "description": "Updated description",
+            "thumbnail": "https://example.com/updated.png",
+        }
+        response = self.client.put(self.detail_url, put_payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.award.refresh_from_db()
+        self.assertEqual(self.award.title, "Fully Updated Award")
+
+        # Editor CANNOT POST (create) -> rejected with 403
         response = self.client.post(
             self.list_url, self.payload, format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Award.objects.count(), 1)
+
+        # Editor CANNOT DELETE -> rejected with 403
         response = self.client.delete(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertTrue(Award.objects.filter(pk=self.award.pk).exists())
@@ -105,12 +130,25 @@ class AwardAPITest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         created_id = response.data["id"]
+
+        # Owner can PUT
         response = self.client.put(
             reverse("api:award-detail", args=[created_id]),
             self.payload,
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Owner can PATCH
+        response = self.client.patch(
+            reverse("api:award-detail", args=[created_id]),
+            {"title": "Patched by Owner"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["title"], "Patched by Owner")
+
+        # Owner can DELETE
         response = self.client.delete(
             reverse("api:award-detail", args=[created_id]),
         )
@@ -129,6 +167,9 @@ class AwardAPITest(APITestCase):
             )
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
             self.assertIn(field, response.data)
+        self.assertEqual(Award.objects.count(), 1)
+
+        # HTML tags are sanitized via strip_tags
         response = self.client.post(
             self.list_url,
             {**self.payload, "title": "<b>Safe title</b>", "description": "<i>Safe description</i>"},
@@ -153,6 +194,35 @@ class AwardAPITest(APITestCase):
         self.assertFalse(response.data["is_starred"])
         self.assertEqual(response.data["star_count"], 0)
 
+    def test_computed_fields_are_read_only(self):
+        self.client.force_authenticate(user=self.owner)
+        response = self.client.post(
+            self.list_url,
+            {
+                **self.payload,
+                "star_count": 999,
+                "is_starred": True,
+                "starred_by_names": "fake-user",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["star_count"], 0)
+        self.assertFalse(response.data["is_starred"])
+
+    def test_wrong_method(self):
+        self.client.force_authenticate(user=self.owner)
+        # DELETE not allowed on list endpoint
+        self.assertEqual(
+            self.client.delete(self.list_url).status_code,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
+        # GET not allowed on star endpoint
+        self.assertEqual(
+            self.client.get(self.star_url).status_code,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
+
     def test_session_authentication_requires_csrf_token(self):
         client = APIClient(enforce_csrf_checks=True)
         self.assertTrue(client.login(
@@ -164,3 +234,22 @@ class AwardAPITest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Award.objects.count(), 1)
+
+    def test_session_write_with_csrf_succeeds(self):
+        client = APIClient(enforce_csrf_checks=True)
+        self.assertTrue(client.login(
+            username="award-owner",
+            password="owner-password",
+        ))
+        # Obtain a real CSRF token from the browsable API
+        page = client.get(self.list_url, HTTP_ACCEPT="text/html")
+        self.assertEqual(page.status_code, status.HTTP_200_OK)
+        token = client.cookies["csrftoken"].value
+        response = client.post(
+            self.list_url,
+            self.payload,
+            format="json",
+            HTTP_X_CSRFTOKEN=token,
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Award.objects.count(), 2)
